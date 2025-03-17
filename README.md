@@ -1,25 +1,24 @@
-# Título do Projeto
+# Brushly
 
 `CURSO: Sistemas de Informação`
 
 `DISCIPLINA: Projeto - Aplicações Web`
 
-`SEMESTRE: 1º`
+`SEMESTRE: 1º Semestre`
 
-Descrever resumidamente, em um ou dois parágrafos, o projeto que está sendo desenvolvido.
+Aplicação web de edição e conversão de imagens (ex.: Photoshop, GIMP, etc) que tem como principal objetivo o minimalismo e performance.
 
 ## Integrantes
 
-* Nome completo do aluno 1
-* Nome completo do aluno 2
-* Nome completo do aluno 3
-* Nome completo do aluno 4
-* Nome completo do aluno 5
+* Theodoro Silva Marques
+* Matheus da Silva Almeida
+* Jairo Miranda Leal
+* Victor Manoel Alves Pereira
 
 
 ## Orientador
 
-* Nome completo do professor 1
+* Marco Rodrigo Costa
 
 # Planejamento
 
