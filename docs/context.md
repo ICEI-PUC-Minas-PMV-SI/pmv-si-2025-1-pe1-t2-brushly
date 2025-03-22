@@ -1,54 +1,43 @@
 # Introdução
 
-Imagine que você deseja apresentar este projeto para investidores que deverão decidir se investem ou não no desenvolvimento da sua ferramenta.
+A edição de imagens tornou-se uma habilidade essencial tanto para profissionais quanto para usuários casuais, impulsionada pelo crescimento das redes sociais, do marketing digital e da produção de conteúdo visual. No entanto, muitas ferramentas populares são complexas, exigem conhecimento avançado e demandam equipamentos de alto desempenho, criando barreiras para uma ampla parcela da população. Em um contexto de crescente digitalização do mercado de trabalho e da vida cotidiana, torna-se necessário oferecer soluções mais acessíveis e eficientes.
 
-A **Introdução** consiste das etapas: *Contextualização -- Definição do problema -- Definição dos Objetivos -- Justificativa*, e tem como função situar o seu trabalho dentro de um contexto de mercado e mostrar a importância da sua proposta para resolver a dor de um usuário.
-
-A Contextualização deve situar sem projeto em um determinado contexto de mercado, a fim de fornecer informações adicionais que possam ajudar a entender melhor o assunto que você irá abordar. Serve também para definir a relevância do seu assunto, uma vez que mostra o tamanho do mercado em que se está inserido. Ela pode envolver a análise de vários aspectos, como o ambiente histórico, cultural, político e social em que o problema a ser atacado surgiu.
-
-Escreva de 2 a 3 parágrafos para contetualizar o seu projeto.
+O Brasil apresenta um cenário econômico e social em que muitas pessoas possuem acesso limitado a softwares pagos e dispositivos de alto desempenho. Ferramentas online leves e intuitivas podem ser uma alternativa viável para esses usuários, permitindo edições básicas sem exigir instalações ou configurações avançadas. Com isso, busca-se atender tanto aqueles que enfrentam desafios financeiros quanto aqueles que necessitam de soluções práticas e rápidas para edições pontuais.
 
 ## Problema
 
-Nesse momento você deve apresentar o problema que a sua aplicação deve resolver. No entanto, **não** é a hora de comentar sobre a solução/aplicação.
+A edição de imagens ainda é um desafio para muitos usuários devido à complexidade das ferramentas existentes, que exigem conhecimento técnico, alto poder computacional ou investimentos financeiros. Softwares profissionais, como Photoshop, são robustos e completos, mas podem ser excessivos para usuários que buscam edições rápidas e simples.
 
-Descreva também o contexto em que essa aplicação será usada, se  houver: empresa, tecnologias, etc. Novamente, descreva apenas o que de fato existir, pois ainda não é a hora de apresentar requisitos detalhados ou projetos.
+Além disso, há uma lacuna no mercado para soluções que conciliem acessibilidade, eficiência e facilidade de uso. Muitas ferramentas gratuitas são limitadas ou repletas de anúncios, enquanto alternativas online podem ser lentas e pouco intuitivas.
 
-Nesse momento, o grupo pode optar por fazer uso  de ferramentas como Design Thinking, que permite um olhar de ponta a ponta para o problema.
+Isso gera impactos significativos em diferentes perfis de usuários, como estudantes, pequenos empreendedores e criadores de conteúdo, que precisam de uma solução prática para editar imagens sem enfrentar barreiras tecnológicas ou financeiras. Dessa forma, há uma necessidade clara por um editor de imagens web que ofereça uma experiência fluida, sem dependência de hardware avançado ou instalação de softwares pesados.
 
-> **Links Úteis**:
-> - [Objetivos, Problema de pesquisa e Justificativa](https://medium.com/@versioparole/objetivos-problema-de-pesquisa-e-justificativa-c98c8233b9c3)
-> - [Matriz Certezas, Suposições e Dúvidas](https://medium.com/educa%C3%A7%C3%A3o-fora-da-caixa/matriz-certezas-suposi%C3%A7%C3%B5es-e-d%C3%BAvidas-fa2263633655)
-> - [Brainstorming](https://www.euax.com.br/2018/09/brainstorming/)
 
 ## Objetivos
 
-Aqui você deve descrever os objetivos do trabalho indicando que o objetivo geral é desenvolver um software para solucionar o problema apresentado acima. 
+O objetivo geral deste projeto é desenvolver um editor de imagens web que seja simples e acessível, permitindo que qualquer pessoa possa realizar edições básicas sem precisar de hardware especializado .
 
-Apresente também alguns (pelo menos 2) objetivos específicos dependendo de onde você vai querer concentrar a sua prática investigativa, ou como você vai aprofundar no seu trabalho.
- 
-> **Links Úteis**:
-> - [Objetivo geral e objetivo específico: como fazer e quais verbos utilizar](https://blog.mettzer.com/diferenca-entre-objetivo-geral-e-objetivo-especifico/)
+Objetivos específicos:
+
+- Criar uma ferramenta compatível com diversos dispositivos e navegadores, sem necessidade de instalação.
+- Oferecer uma interface intuitiva, facilitando o uso para qualquer nível de experiência.
+- Explorar soluções que garantam um bom desempenho, mesmo em dispositivos com recursos limitados.
+- Testar e otimizar a experiência do usuário, garantindo fluidez e eficiência na edição de imagens.
+- Trabalhar de forma colaborativa, garantindo uma boa organização no desenvolvimento do projeto.
 
 ## Justificativa
 
-Descreva a importância ou a motivação para trabalhar com esta aplicação que você escolheu. Indique as razões pelas quais você escolheu seus objetivos específicos ou as razões para aprofundar em certos aspectos do software.
+Dado o cenário econômico e social do Brasil e a crescente digitalização do mercado de trabalho, o acesso a ferramentas de edição de imagem pode representar uma barreira para muitos indivíduos, especialmente aqueles com recursos financeiros limitados. Softwares pagos e a necessidade de equipamentos de alto desempenho dificultam a inclusão de novos usuários nessas áreas, restringindo oportunidades tanto para uso profissional quanto pessoal.
 
-Lembre-se de pesquisar e utilizar números que justifiquem por que é importante que tal problema seja resolvido ou que mostrem o impacto do problema na vida das pessoas.
+Além disso, mesmo para aqueles que não enfrentam dificuldades financeiras, há uma demanda crescente por ferramentas mais práticas e acessíveis. Usuários ocasionais ou profissionais que necessitam realizar edições pontuais podem se beneficiar de uma solução que elimine a necessidade de softwares complexos e de carregamento demorado. A disponibilidade de um editor online leve e eficiente torna-se, portanto, uma alternativa viável para diferentes perfis de usuários, ampliando sua aplicabilidade.
 
-O grupo de trabalho pode fazer uso de questionários, entrevistas e dados estatísticos, que podem ser apresentados, com o objetivo de esclarecer detalhes do problema que será abordado pelo grupo.
-
-> **Links Úteis**:
-> - [Como montar a justificativa](https://guiadamonografia.com.br/como-montar-justificativa-do-tcc/)
+Este projeto busca suprir essa necessidade ao desenvolver uma ferramenta de edição de imagens acessível, intuitiva e eficiente, capaz de operar em dispositivos com recursos computacionais limitados sem comprometer a experiência do usuário. Para isso, o trabalho se fundamentará em estudos sobre usabilidade, desempenho de aplicações web e design de interfaces intuitivas, garantindo uma solução eficaz tanto para usuários em situação de vulnerabilidade quanto para aqueles que buscam praticidade e eficiência em seu dia a dia.
 
 ## Público-Alvo
 
-Descreva quem serão as pessoas que usarão a sua aplicação indicando os diferentes perfis. O objetivo aqui não é definir quem serão os clientes ou quais serão os papéis dos usuários na aplicação. A ideia é, dentro do possível, conhecer um pouco mais sobre o perfil dos usuários: conhecimentos prévios, relação com a tecnologia, relações hierárquicas, etc.
+O público-alvo deste projeto é composto por:
 
-Adicione informações sobre o público-alvo por meio de uma descrição textual, diagramas de personas e mapa de stakeholders.
-
-> **Links Úteis**:
-> - [Público-alvo](https://blog.hotmart.com/pt-br/publico-alvo/)
-> - [Como definir o público alvo](https://exame.com/pme/5-dicas-essenciais-para-definir-o-publico-alvo-do-seu-negocio/)
-> - [Público-alvo: o que é, tipos, como definir seu público e exemplos](https://klickpages.com.br/blog/publico-alvo-o-que-e/)
-> - [Qual a diferença entre público-alvo e persona?](https://rockcontent.com/blog/diferenca-publico-alvo-e-persona/)
+- Indivíduos que enfrentam limitações no acesso a equipamentos de alto desempenho ou a softwares de edição pagos.
+- Usuários ocasionais que necessitam realizar edições pontuais.
+- Indivíduos com demandas simples que buscam otimizar seu tempo, evitando o carregamento de programas robustos e complexos.
+- Profissionais que valorizam praticidade e eficiência, necessitando de uma alternativa acessível e funcional para edições rápidas sem a necessidade de conhecimento técnico avançado.
