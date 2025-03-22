@@ -1,44 +1,58 @@
 # Especificações do Projeto
 
-Definição do problema e ideia de solução a partir da perspectiva do usuário. É composta pela definição do  diagrama de personas, histórias de usuários, requisitos funcionais e não funcionais além das restrições do projeto.
-
-Apresente uma visão geral do que será abordado nesta parte do documento, enumerando as técnicas e/ou ferramentas utilizadas para realizar a especificações do projeto.
-
-Caso deseje atribuir uma imagem a sua persona, utilize o site https://thispersondoesnotexist.com/
+Este documento apresenta as diretrizes e requisitos para o desenvolvimento de um editor de imagens web, destacando as necessidades dos usuários e as funcionalidades esperadas. A especificação inclui a definição de personas, histórias de usuário, requisitos funcionais e não funcionais, além das restrições do projeto.
 
 ## Personas
 
-Pedro Paulo tem 26 anos, é arquiteto recém-formado e autônomo. Pensa em se desenvolver profissionalmente através de um mestrado fora do país, pois adora viajar, é solteiro e sempre quis fazer um intercâmbio. Está buscando uma agência que o ajude a encontrar universidades na Europa que aceitem alunos estrangeiros.
+João, o Estudante Universitário
+- Idade: 21 anos
+- Profissão: Estudante de engenharia da computação
+- Habilidades com tecnologia: Alta, mas sem experiência com ferramentas profissionais de edição de imagem
+- Necessidades: Precisa editar imagens para apresentações acadêmicas e projetos universitários, como pôsteres e relatórios. Busca uma ferramenta intuitiva e acessível, já que não tem condições de pagar por softwares avançados.
+- Desafios: Enfrenta prazos curtos e precisa de uma solução rápida para ajustes básicos, como redimensionamento, corte e anotações sobre imagens.
+- Expectativas: Interface minimalista e sem curva de aprendizado complexa. Ferramentas rápidas de uso intuitivo.
 
-Enumere e detalhe as personas da sua solução. Para tanto, baseie-se tanto nos documentos disponibilizados na disciplina e/ou nos seguintes links:
+Maria, a Empreendedora
+- Idade: 34 anos
+- Profissão: Proprietária de uma loja de roupas online
+- Habilidades com tecnologia: Média, utiliza redes sociais e aplicativos de design simplificados
+- Necessidades: Precisa criar conteúdos visuais para redes sociais e promoções. Busca um editor que permita aplicar filtros, adicionar textos e personalizar imagens rapidamente.
+- Desafios: Não tem tempo para aprender ferramentas complexas e precisa de templates e recursos pré-configurados para agilizar suas postagens.
+- Expectativas: Ferramentas rápidas e intuitivas com templates prontos. Possibilidade de salvar presets para reutilização.
 
-> **Links Úteis**:
-> - [Rock Content](https://rockcontent.com/blog/personas/)
-> - [Hotmart](https://blog.hotmart.com/pt-br/como-criar-persona-negocio/)
-> - [O que é persona?](https://resultadosdigitais.com.br/blog/persona-o-que-e/)
-> - [Persona x Público-alvo](https://flammo.com.br/blog/persona-e-publico-alvo-qual-a-diferenca/)
-> - [Mapa de Empatia](https://resultadosdigitais.com.br/blog/mapa-da-empatia/)
-> - [Mapa de Stalkeholders](https://www.racecomunicacao.com.br/blog/como-fazer-o-mapeamento-de-stakeholders/)
->
-Lembre-se que você deve ser enumerar e descrever precisamente e personalizada todos os clientes ideais que sua solução almeja.
+Carlos, o Designer Iniciante
+- Idade: 26 anos
+- Profissão: Estudante de design gráfico
+- Habilidades com tecnologia: Média a alta, já experimentou softwares de edição, mas ainda está aprendendo técnicas avançadas
+- Necessidades: Quer um editor onde possa praticar ajustes de brilho, contraste, saturação e experimentação com camadas e filtros.
+- Desafios: Busca uma interface intuitiva, mas com recursos avançados suficientes para aprender conceitos sem precisar de um software profissional pago.
+- Expectativas: Ferramentas que simulem a lógica de editores profissionais sem a complexidade de uso.
+
+Ana, a Usuária Casual
+- Idade: 40 anos
+- Profissão: Professora do ensino fundamental
+- Habilidades com tecnologia: Baixa, utiliza apenas recursos básicos em aplicativos do dia a dia
+- Necessidades: Deseja editar fotos pessoais de forma simples, sem necessidade de instalação de programas complexos. Busca funcionalidades como cortes, remoção de olhos vermelhos e filtros rápidos.
+- Desafios: Não quer perder tempo aprendendo a usar a ferramenta e prefere interfaces intuitivas, com instruções visuais claras.
+- Expectativas: Interface simplificada com botões autoexplicativos e tutoriais curtos.
+
+Mário, o Criador de Conteúdo
+- Idade: 29 anos
+- Profissão: YouTuber e produtor de conteúdo digital
+- Habilidades com tecnologia: Alta, já utiliza editores profissionais como Photoshop e Premiere
+- Necessidades: Precisa de um editor rápido para ajustes finais em thumbnails e imagens para redes sociais. Valoriza ferramentas que otimizem o fluxo de trabalho e permitam personalizações avançadas.
+- Desafios: Não quer perder tempo com processos demorados e busca atalhos e recursos de automação para melhorar sua produtividade.
+- Expectativas: Ferramentas que permitam ajustes rápidos e reutilização de configurações.
 
 ## Histórias de Usuários
 
-Com base na análise das personas forma identificadas as seguintes histórias de usuários:
-
-|EU COMO... `PERSONA`| QUERO/PRECISO ... `FUNCIONALIDADE` |PARA ... `MOTIVO/VALOR`                 |
-|--------------------|------------------------------------|----------------------------------------|
-|Usuário do sistema  | Registrar minhas tarefas           | Não esquecer de fazê-las               |
-|Administrador       | Alterar permissões                 | Permitir que possam administrar contas |
-
-Apresente aqui as histórias de usuário que são relevantes para o projeto de sua solução. As Histórias de Usuário consistem em uma ferramenta poderosa para a compreensão e elicitação dos requisitos funcionais e não funcionais da sua aplicação. Se possível, agrupe as histórias de usuário por contexto, para facilitar consultas recorrentes à essa parte do documento.
-
-> **Links Úteis**:
-> - [Histórias de usuários com exemplos e template](https://www.atlassian.com/br/agile/project-management/user-stories)
-> - [Como escrever boas histórias de usuário (User Stories)](https://medium.com/vertice/como-escrever-boas-users-stories-hist%C3%B3rias-de-usu%C3%A1rios-b29c75043fac)
-> - [User Stories: requisitos que humanos entendem](https://www.luiztools.com.br/post/user-stories-descricao-de-requisitos-que-humanos-entendem/)
-> - [Histórias de Usuários: mais exemplos](https://www.reqview.com/doc/user-stories-example.html)
-> - [9 Common User Story Mistakes](https://airfocus.com/blog/user-story-mistakes/)
+|Eu como|Preciso/Quero|Para|
+|-------|-------------|----|
+|João, o Estudante Universitário|Redimensionar e cortar imagens facilmente|Ajustar fotos para apresentações acadêmicas sem perder qualidade|
+|Maria, a Empreendedora|Aplicar filtros e sobrepor textos nas imagens|Criar posts rápidos para redes sociais sem precisar contratar um designer|
+|Carlos, o Designer Iniciante|Experimentar diferentes ajustes de brilho, contraste e saturação|Aprender conceitos básicos de edição sem precisar de softwares pagos|
+|Ana, a Usuária Casual|Fazer edições rápidas sem precisar baixar programas|Ajustar fotos pessoais sem complicação e com poucos cliques|
+|Mário, o Criador de Conteúdo|Ajustar rapidamente uma thumbnail já criada|Evitar retrabalho no Photoshop e agilizar o upload dos vídeos|
 
 ## Requisitos
 
@@ -46,33 +60,25 @@ As tabelas que se seguem apresentam os requisitos funcionais e não funcionais q
 
 ### Requisitos Funcionais
 
-|ID    | Descrição do Requisito  | Prioridade | 
-|------|-----------------------------------------|----| 
-|RF-001| A aplicação deve permitir que o usuário gerencie suas tarefas | ALTA |  
-|RF-002| A aplicação deve permitir a emissão de um relatório de tarefas realizadas no mês   | MÉDIA | 
-
+|ID|Descrição do Requisito|Prioridade|
+|--|----------------------|----------|
+|RF-001|Permitir upload de imagens nos formatos PNG e JPG|Alta|
+|RF-002|Disponibilizar ferramentas de edição básicas (corte, redimensionamento, brilho, contraste)|Alta|
+|RF-003|Oferecer sobreposição de textos personalizáveis|Média|
+|RF-004|Possibilitar a exportação da imagem editada|Alta|
+|RF-005|Implementar histórico de edições para desfazer alterações|Média|
+|RF-006|Suporte a camadas para edição avançada|Média|
+|RF-007|Aplicação de filtros como grayscale, invert, blur|Média|
 
 ### Requisitos não Funcionais
 
-|ID     | Descrição do Requisito  |Prioridade |
-|-------|-------------------------|----|
-|RNF-001| A aplicação deve ser responsiva | MÉDIA | 
-|RNF-002| A aplicação deve processar requisições do usuário em no máximo 3s |  BAIXA | 
-
-Com base nas Histórias de Usuário, enumere os requisitos da sua solução. Classifique esses requisitos em dois grupos:
-
-- [Requisitos Funcionais
- (RF)](https://pt.wikipedia.org/wiki/Requisito_funcional):
- correspondem a uma funcionalidade que deve estar presente na
-  plataforma (ex: cadastro de usuário).
-- [Requisitos Não Funcionais
-  (RNF)](https://pt.wikipedia.org/wiki/Requisito_n%C3%A3o_funcional):
-  correspondem a uma característica técnica, seja de usabilidade,
-  desempenho, confiabilidade, segurança ou outro (ex: suporte a
-  dispositivos iOS e Android).
-Lembre-se que cada requisito deve corresponder à uma e somente uma
-característica alvo da sua solução. Além disso, certifique-se de que
-todos os aspectos capturados nas Histórias de Usuário foram cobertos.
+|ID|Descrição do Requisito|Prioridade|
+|--|----------------------|----------|
+|RNF-001|O editor deve ser responsivo e funcionar em dispositivos móveis|Alta|
+|RNF-002|O tempo máximo de carregamento da aplicação não deve ultrapassar 3 segundos|Média|
+|RNF-003|As edições devem ser processadas no cliente para reduzir latência|Alta|
+|RNF-004|A interface deve ser intuitiva, com botões autoexplicativos|Média|
+|RNF-005|O editor deve ser capaz de lidar com imagens de alta resolução sem perda de desempenho|Alta|
 
 ## Restrições
 
@@ -82,10 +88,5 @@ O projeto está restrito pelos itens apresentados na tabela a seguir.
 |--|-------------------------------------------------------|
 |01| O projeto deverá ser entregue até o final do semestre |
 |02| Não pode ser desenvolvido um módulo de backend        |
+|03| Não pode utilizar APIs externas                       |
 
-
-Enumere as restrições à sua solução. Lembre-se de que as restrições geralmente limitam a solução candidata.
-
-> **Links Úteis**:
-> - [O que são Requisitos Funcionais e Requisitos Não Funcionais?](https://codificar.com.br/requisitos-funcionais-nao-funcionais/)
-> - [O que são requisitos funcionais e requisitos não funcionais?](https://analisederequisitos.com.br/requisitos-funcionais-e-requisitos-nao-funcionais-o-que-sao/)
