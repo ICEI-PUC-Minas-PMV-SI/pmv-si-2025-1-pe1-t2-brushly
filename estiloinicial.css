@@ -1,0 +1,162 @@
+/* Cores */
+:root {
+  --branco: #ffffff;
+  --preto: #000000;
+  --cinza: #4A4A4A;
+  --cinza-claro: #878787;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: var(--branco);
+  color: var(--cinza);
+}
+
+.container {
+  padding: 2rem;
+}
+
+.cabecalho .logo {
+  font-weight: bold;
+  color: var(--preto);
+  margin-bottom: 2rem;
+  font-size: 20px;
+}
+
+.main {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.texto {
+  flex: 1;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.texto h1 {
+  color: var(--preto);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.texto p {
+  color: var(--cinza-claro);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.texto button {
+  background-color: var(--preto);
+  color: var(--branco);
+  padding: 0.8rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+
+.image-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 300px;
+  margin-top: 1rem;
+}
+
+.image-section img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--cinza);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #878787;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal {
+  background-color: var(--branco);
+  padding: 2rem;
+  border-radius: 8px;
+  width: 300px;
+  position: relative;
+  box-shadow: 0 4px 8px #000000;
+}
+
+.modal-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background-color: var(--preto);
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+
+.modal h2 {
+  color: var(--preto);
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--cinza-claro);
+  margin-right: 0.5rem;
+  color: var(--cinza-claro);
+}
+
+.input-group button {
+  background-color: var(--preto);
+  color: var(--branco);
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.butoes {
+  display: flex;
+  justify-content: space-between;
+}
+
+.butoes button {
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.cancel {
+  background-color: transparent;
+  color: var(--cinza-claro);
+}
+
+.upload {
+  background-color: var(--preto);
+  color: var(--branco);
+}
