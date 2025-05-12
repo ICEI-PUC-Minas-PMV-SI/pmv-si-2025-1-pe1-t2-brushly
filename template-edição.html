@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brushly</title>
+    <link rel="stylesheet" href="estiloedicao.css">
+</head>
+<body>
+
+    <div class="main-content">
+        Imagem
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-toggle">></div>
+
+        <div class="sidebar-icon-row">
+            <div class="sidebar-icon">
+                <span class="icon">&larr;</span>
+                <span>Desfazer</span>
+            </div>
+            <div class="sidebar-icon">
+                <span class="icon">&rarr;</span>
+                <span>Refazer</span>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="sidebar-icon-row">
+            <div class="sidebar-icon">
+                <span class="icon">&#9986;</span>
+                <span>Cortar</span>
+            </div>
+            <div class="sidebar-icon">
+                <span class="icon">&#9728;</span>
+                <span>Ajustar</span>
+            </div>
+        </div>
+
+        <div class="sidebar-icon-row">
+            <div class="sidebar-icon">
+                <span class="icon">&#9998;</span>
+                <span>Marcação</span>
+            </div>
+            <div class="sidebar-icon">
+                <span class="icon">&#9778;</span>
+                <span>Filtros</span>
+            </div>
+        </div>
+
+        <div class="sidebar-buttons-container">
+            <a href="#abrir-imagem" class="sidebar-button">Abrir Imagem</a>
+            <a href="#exportar-imagem" class="sidebar-button">Exportar Imagem</a>
+        </div>
+    </div>
+
+    <div id="abrir-imagem" class="modal-page">
+        <div class="modal-content">
+            <h2>Abrir Imagem</h2>
+            
+            <button onclick="document.getElementById('abrir-imagem').style.display='none'">Fechar</button>
+            <button>Escolher Arquivo</button>
+        </div>
+    </div>
+
+    <div id="exportar-imagem" class="modal-page">
+        <div class="modal-content">
+            <h2>Exportar Imagem</h2>
+      
+            
+            </select><br><br>
+            <label for="local">Local:</label>
+            <input type="text" id="local" placeholder="Local">
+            <button>Escolher</button><br><br>
+            <button onclick="document.getElementById('exportar-imagem').style.display='none'">Cancelar</button>
+            <button>Exportar</button>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidade para mostrar/esconder as páginas modais
+        document.querySelectorAll('.sidebar-button').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                document.getElementById(targetId).style.display = 'flex';
+            });
+        });
+    </script>
+
+</body>
+</html>
