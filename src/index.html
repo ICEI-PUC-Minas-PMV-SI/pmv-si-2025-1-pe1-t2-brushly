@@ -5,7 +5,7 @@
   <title>Brushly</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estiloinicial.css">
+  <link rel="stylesheet" href="styles/estiloinicial.css">
 </head>
 <body>
   <div class="container">
@@ -20,7 +20,7 @@
         <button id="start-btn">Comece Agora</button>
       </div>
       <div class="image-section">
-        <img src="imagem/imagem-template.jpeg" alt="Exemplo" />
+        <img src="assets/images/imagem-template.jpeg" alt="Exemplo" />
       </div>
     </div>
   </div>
@@ -31,27 +31,16 @@
       <div class="modal-corner"></div>
       <h2>Selecione sua imagem</h2>
       <div class="input-group">
-        <input type="text" placeholder="Imagem" disabled />
-        <button>Escolher</button>
+        <input type="text" id="file-name" placeholder="Nenhum arquivo selecionado" disabled />
+        <button type="button" id="custom-button">Escolher</button>
+        <input type="file" id="file-input" accept="image/*" hidden />
       </div>
       <div class="butoes">
         <button class="cancel" onclick="closeModal()">Cancel</button>
-        <button class="upload">Upload</button>
+        <button class="upload" id="upload-btn">Upload</button>
       </div>
     </div>
   </div>
-
-  <script>
-    const modal = document.getElementById("modal");
-    const startBtn = document.getElementById("start-btn");
-
-    startBtn.onclick = () => {
-      modal.style.display = "flex";
-    };
-
-    function closeModal() {
-      modal.style.display = "none";
-    }
-  </script>
 </body>
+<script src="scripts/home.js"></script>
 </html
