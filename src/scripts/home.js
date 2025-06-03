@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const reader = new FileReader();
       reader.onload = function (e) {
         sessionStorage.setItem("imagemBase64", e.target.result);
-        window.location.href = "pages/template-edição.html";
+        window.location.href = "src/pages/template-edição.html";
       };
       reader.readAsDataURL(fileInput.files[0]);
     });
