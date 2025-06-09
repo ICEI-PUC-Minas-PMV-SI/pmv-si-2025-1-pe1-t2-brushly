@@ -1,16 +1,16 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brushly</title>
-    <link rel="stylesheet" href="estiloedicao.css">
+    <link rel="stylesheet" href="../styles/estiloedicao.css">
 </head>
 <body>
 
     <div class="main-content">
-        Imagem
-    </div>
+        </div>
 
     <div class="sidebar">
         <div class="sidebar-toggle">></div>
@@ -40,7 +40,7 @@
         </div>
 
         <div class="sidebar-icon-row">
-            <div class="sidebar-icon">
+            <div class="sidebar-icon" id="marker-tool-button">
                 <span class="icon">&#9998;</span>
                 <span>Marcação</span>
             </div>
@@ -59,36 +59,27 @@
     <div id="abrir-imagem" class="modal-page">
         <div class="modal-content">
             <h2>Abrir Imagem</h2>
-            
+            <input type="file" id="file-input" accept="image/*" hidden />
+            <button id="custom-button-edicao">Escolher Arquivo</button>
+            <input type="text" id="file-name-edicao" placeholder="Nenhum arquivo selecionado" disabled />
+            <br><br>
             <button onclick="document.getElementById('abrir-imagem').style.display='none'">Fechar</button>
-            <button>Escolher Arquivo</button>
         </div>
     </div>
 
     <div id="exportar-imagem" class="modal-page">
         <div class="modal-content">
             <h2>Exportar Imagem</h2>
-      
-            
+            <label for="format">Formato:</label>
+            <select id="format">
+                <option value="png">PNG</option>
+                <option value="jpeg">JPEG</option>
+                <option value="webp">WEBP</option>
             </select><br><br>
-            <label for="local">Local:</label>
-            <input type="text" id="local" placeholder="Local">
-            <button>Escolher</button><br><br>
             <button onclick="document.getElementById('exportar-imagem').style.display='none'">Cancelar</button>
-            <button>Exportar</button>
-        </div>
+            <button onclick="exportImage()">Exportar</button> </div>
     </div>
-
-    <script>
-        // Funcionalidade para mostrar/esconder as páginas modais
-        document.querySelectorAll('.sidebar-button').forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const targetId = this.getAttribute('href').substring(1);
-                document.getElementById(targetId).style.display = 'flex';
-            });
-        });
-    </script>
-
+    <button id="crop-confirm-button">Confirmar Corte</button>
+<script src="../scripts/editor.js"></script>
 </body>
 </html>
