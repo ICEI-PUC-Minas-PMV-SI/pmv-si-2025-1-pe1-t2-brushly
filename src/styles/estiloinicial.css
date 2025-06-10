@@ -96,7 +96,7 @@ body {
   background-color: var(--branco);
   padding: 2rem;
   border-radius: 8px;
-  width: 300px;
+  width: 400px;
   position: relative;
   box-shadow: 0 4px 8px #000000;
 }
@@ -118,14 +118,17 @@ body {
 
 .input-group {
   display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
 
-.input-group input {
+.input-group input[type="text"] {
   flex: 1;
   padding: 0.5rem;
   border: 1px solid var(--cinza-claro);
-  margin-right: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
   color: var(--cinza-claro);
 }
 
@@ -134,22 +137,28 @@ body {
   color: var(--branco);
   border: none;
   padding: 0.5rem 1rem;
-  cursor: pointer;
+  font-size: 0.9rem;
   border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .butoes {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .butoes button {
-  padding: 0.5rem 1.2rem;
-  border-radius: 4px;
+  flex: 1;
+  padding: 0.6rem;
   font-size: 1rem;
+  border-radius: 4px;
   border: none;
   cursor: pointer;
 }
+
 
 .cancel {
   background-color: transparent;
