@@ -40,7 +40,7 @@ Serão testadas funcionalidades de upload, edição, visualização e download d
 
 
 
-##3. Avaliação dos Testes de Software
+## 3. Avaliação dos Testes de Software
 
 **Resumo:**  
 Todos os testes funcionais e de regressão foram concluídos com sucesso. O sistema apresenta estabilidade e comportamentos esperados nas funcionalidades principais.
