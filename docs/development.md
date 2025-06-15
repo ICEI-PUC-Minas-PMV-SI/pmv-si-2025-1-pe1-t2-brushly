@@ -5,7 +5,6 @@
 
 | Código | Descrição                                                                 | Responsável                | Artefato Criado              |
 |--------|---------------------------------------------------------------------------|-----------------------------|------------------------------|
-
 | RF01   | O sistema deve permitir ao usuário iniciar a edição ao clicar em "Comece Agora". | A Definir              |         |
 | RF02   | O sistema deve permitir o upload de imagens no formato `.jpg`, `.png`, etc. | A Definir                   | |
 | RF03   | O sistema deve abrir uma janela para selecionar a imagem.                   | A Definir                   |      |
