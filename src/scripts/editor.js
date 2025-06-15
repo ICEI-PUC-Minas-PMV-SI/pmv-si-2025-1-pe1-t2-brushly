@@ -6,12 +6,150 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileNameEdicao = document.getElementById('file-name-edicao');
     const abrirImagemModal = document.getElementById('abrir-imagem');
     const exportarImagemModal = document.getElementById('exportar-imagem');
+    const undoButton = document.getElementById('undo-button');
+    const redoButton = document.getElementById('redo-button');
 
     let canvas, ctx;
     let isDrawing = false;
     let isMarkerActive = false;
     let lastX, lastY;
-    let currentImage = null; 
+    let currentImage = null;
+
+    // Action Stack System
+    const MAX_STACK_SIZE = 50;
+    let actionStack = [];
+    let currentActionIndex = -1;
+    let isActionInProgress = false;
+
+    class CanvasAction {
+        constructor(type, data) {
+            this.type = type;
+            this.data = data;
+            this.timestamp = Date.now();
+        }
+    }
+
+    function saveCanvasState() {
+        if (!canvas) return null;
+        return canvas.toDataURL('image/png');
+    }
+
+    function loadCanvasState(dataURL) {
+        if (!canvas || !ctx) return;
+        const img = new Image();
+        img.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = dataURL;
+    }
+
+    function pushAction(type, data) {
+        if (isActionInProgress) return;
+
+        // Remove any future actions if we're not at the end of the stack
+        if (currentActionIndex < actionStack.length - 1) {
+            actionStack = actionStack.slice(0, currentActionIndex + 1);
+        }
+
+        // Add new action
+        const action = new CanvasAction(type, data);
+        actionStack.push(action);
+        currentActionIndex = actionStack.length - 1;
+
+        // Maintain stack size limit
+        if (actionStack.length > MAX_STACK_SIZE) {
+            actionStack.shift();
+            currentActionIndex--;
+        }
+
+        updateUndoRedoButtons();
+    }
+
+    function undo() {
+        if (currentActionIndex < 0) return;
+
+        isActionInProgress = true;
+        currentActionIndex--;
+        loadCanvasState(actionStack[currentActionIndex].data);
+        updateUndoRedoButtons();
+        isActionInProgress = false;
+    }
+
+    function redo() {
+        if (currentActionIndex >= actionStack.length - 1) return;
+
+        isActionInProgress = true;
+        currentActionIndex++;
+        loadCanvasState(actionStack[currentActionIndex].data);
+        updateUndoRedoButtons();
+        isActionInProgress = false;
+    }
+
+    function updateUndoRedoButtons() {
+        if (undoButton) {
+            if (currentActionIndex > 0) {
+                undoButton.style.color = '#ffffff';
+                undoButton.style.cursor = 'pointer';
+                undoButton.classList.add('active');
+            } else {
+                undoButton.style.color = '#878787';
+                undoButton.style.cursor = 'default';
+                undoButton.classList.remove('active');
+            }
+        }
+        if (redoButton) {
+            if (currentActionIndex < actionStack.length - 1) {
+                redoButton.style.color = '#ffffff';
+                redoButton.style.cursor = 'pointer';
+                redoButton.classList.add('active');
+            } else {
+                redoButton.style.color = '#878787';
+                redoButton.style.cursor = 'default';
+                redoButton.classList.remove('active');
+            }
+        }
+    }
+
+    // Initialize action stack with initial canvas state
+    function initializeActionStack() {
+        const initialState = saveCanvasState();
+        if (initialState) {
+            actionStack = [new CanvasAction('initial', initialState)];
+            currentActionIndex = 0;
+            updateUndoRedoButtons();
+        }
+    }
+
+    // Event Listeners for Undo/Redo
+    if (undoButton) {
+        undoButton.addEventListener('click', () => {
+            if (currentActionIndex > 0) undo();
+        });
+    }
+
+    if (redoButton) {
+        redoButton.addEventListener('click', () => {
+            if (currentActionIndex < actionStack.length - 1) redo();
+        });
+    }
+
+    // Keyboard shortcuts for Undo/Redo
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) { // metaKey for Mac
+            if (e.key === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    redo();
+                } else {
+                    undo();
+                }
+            } else if (e.key === 'y') {
+                e.preventDefault();
+                redo();
+            }
+        }
+    });
 
     let markerColor = 'rgba(255, 255, 0, 0.4)';
     let markerLineWidth = 20;
@@ -22,10 +160,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initializeCanvas() {
         if (canvas) {
+            // Canvas already exists, just update its size
+            const currentState = saveCanvasState();
+            canvas.width = mainContent.clientWidth > 0 ? mainContent.clientWidth : 600;
+            canvas.height = mainContent.clientHeight > 0 ? mainContent.clientHeight : 400;
+            if (currentState) {
+                loadCanvasState(currentState);
+            }
         } else {
             canvas = document.createElement('canvas');
             canvas.id = 'imageCanvas';
-            mainContent.innerHTML = ''; 
+            mainContent.innerHTML = '';
             mainContent.appendChild(canvas);
             ctx = canvas.getContext('2d');
             setupCanvasEventListeners();
@@ -33,13 +178,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadImageOntoCanvas(imageSrc) {
-        initializeCanvas(); 
+        initializeCanvas();
 
         const img = new Image();
         img.onload = () => {
-            currentImage = img; 
+            currentImage = img;
             drawImageWithAspectRatio(img);
             sessionStorage.removeItem('imagemBase64');
+            // Save initial state after loading image
+            setTimeout(initializeActionStack, 100);
         };
         img.onerror = () => {
             console.error("Erro ao carregar imagem.");
@@ -194,6 +341,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function stopDrawing() {
         if (!isDrawing || !canvas) return;
         isDrawing = false;
+        
+        // Save state after drawing is complete
+        const currentState = saveCanvasState();
+        if (currentState) {
+            pushAction('draw', currentState);
+        }
     }
 
     function setupCanvasEventListeners() {
@@ -264,4 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Initialize action stack when the page loads
+    setTimeout(initializeActionStack, 100);
 });
