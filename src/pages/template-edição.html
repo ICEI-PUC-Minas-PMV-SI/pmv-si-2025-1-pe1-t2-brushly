@@ -42,6 +42,7 @@
             <div class="sidebar-icon" id="marker-tool-button">
                 <span class="icon">&#9998;</span>
                 <span>Marcação</span>
+                <div id="marker-color-indicator"></div>
             </div>
             <div class="sidebar-icon">
                 <span class="icon">&#9778;</span>
@@ -78,6 +79,20 @@
             <button onclick="document.getElementById('exportar-imagem').style.display='none'">Cancelar</button>
             <button onclick="exportImage()">Exportar</button> </div>
     </div>
-<script src="../scripts/editor.js"></script>
+
+    <div id="marker-color-picker" class="modal-page">
+        <div class="modal-content color-picker-modal">
+            <h2>Escolher Cor do Marcador</h2>
+            <input type="color" id="marker-color-input" value="#ffff00">
+            <div class="opacity-control">
+                <label for="marker-opacity">Opacidade:</label>
+                <input type="range" id="marker-opacity" min="0" max="100" value="40">
+                <span id="opacity-value">40%</span>
+            </div>
+            <button onclick="document.getElementById('marker-color-picker').style.display='none'">Confirmar</button>
+        </div>
+    </div>
+
+    <script src="../scripts/editor.js"></script>
 </body>
 </html>

@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let markerColor = 'rgba(255, 255, 0, 0.4)';
     let markerLineWidth = 20;
+    let markerColorIndicator = document.getElementById('marker-color-indicator');
+    let markerColorInput = document.getElementById('marker-color-input');
+    let markerOpacityInput = document.getElementById('marker-opacity');
+    let opacityValue = document.getElementById('opacity-value');
 
     function initializeCanvas() {
         if (canvas) {
@@ -104,6 +108,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    function updateMarkerColor() {
+        const color = markerColorInput.value;
+        const opacity = markerOpacityInput.value / 100;
+        markerColor = hexToRgba(color, opacity);
+        if (markerColorIndicator) {
+            markerColorIndicator.style.backgroundColor = color;
+            markerColorIndicator.style.opacity = opacity;
+        }
+    }
+
+    function hexToRgba(hex, opacity) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+
+    if (markerColorInput && markerOpacityInput) {
+        markerColorInput.addEventListener('input', updateMarkerColor);
+        markerOpacityInput.addEventListener('input', () => {
+            opacityValue.textContent = `${markerOpacityInput.value}%`;
+            updateMarkerColor();
+        });
+    }
+
     if (markerToolButton) {
         markerToolButton.addEventListener('click', () => {
             isMarkerActive = !isMarkerActive;
@@ -115,7 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (canvas) canvas.style.cursor = 'default';
             }
         });
+
+        markerToolButton.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            const colorPicker = document.getElementById('marker-color-picker');
+            if (colorPicker) {
+                colorPicker.style.display = 'flex';
+            }
+        });
     }
+
+    // Initialize marker color
+    updateMarkerColor();
 
     function getMousePos(canvasDom, event) {
         const rect = canvasDom.getBoundingClientRect();
