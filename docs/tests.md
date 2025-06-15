@@ -57,7 +57,7 @@ Todos os testes funcionais e de regressão foram concluídos com sucesso. O sist
 | Cenário | Descrição                                               | Expectativa do Usuário                     |
 |---------|---------------------------------------------------------|--------------------------------------------|
 | C01     | Usuário encontra o botão de upload facilmente           | Localização intuitiva e rótulo claro       |
-| C02     | Usuário edita imagem sem instruções                     | Interface deve ser autoexplicativa         |
+| C02     | Usuário edita imagem sem instruções(todas as edições disponíveis atualmente)                   | Interface deve ser autoexplicativa         |
 | C03     | Usuário entende o ícone de download                     | Ícone deve ser reconhecível                |
 | C04     | Retorno visual após edição                              | Mudança visível imediatamente após ação    |
 
@@ -67,8 +67,10 @@ Todos os testes funcionais e de regressão foram concluídos com sucesso. O sist
 
 | Cenário | Método         | Participantes | Resultado                          | 
 |---------|----------------|---------------|------------------------------------|
-| C01     | Teste Guiado   | 3 usuários    | Todos localizaram o botão          |
-| C02     | Teste Livre    | 2 usuários    | Todos localizaram e ententederam do que se tratava   |       |
+| C01     | Teste Livre   | 3 usuários    | Todos localizaram o botão          |
+| C02     | Teste Livre    | 2 usuários    | Todos localizaram e ententederam do que se tratava   |
+| C03     | Teste Livre    | 2 usuários    | Todos localizaram e ententederam do que se tratava   |
+| C04     | Teste Livre    | 2 usuários    | Todos visualizaram claramente as mudanças   |
 
 
 
