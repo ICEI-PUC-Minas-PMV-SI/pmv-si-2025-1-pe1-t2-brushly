@@ -50,13 +50,6 @@ body {
   z-index: 10;
 }
 
-.sidebar-toggle {
-  align-self: flex-start;
-  margin-bottom: 30px;
-  cursor: pointer;
-  color: #878787;
-}
-
 .sidebar-icon-row {
   display: flex;
   justify-content: space-around;
