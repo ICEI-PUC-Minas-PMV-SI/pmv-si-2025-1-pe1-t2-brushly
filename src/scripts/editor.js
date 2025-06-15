@@ -1,4 +1,28 @@
+console.log('Script file loaded!');
+alert('Script is loading!');
+
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded - Script is running!');
+    alert('DOM Content Loaded!');
+    
+    const undoButton = document.getElementById('undo-button');
+    console.log('Undo button found:', !!undoButton);
+    
+    if (undoButton) {
+        undoButton.addEventListener('click', () => {
+            console.log('UNDO BUTTON CLICKED!');
+            alert('Undo button clicked!');
+        });
+    }
+});
+
+// Replace with:
+
+console.log('Script file loaded!');
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded - Script is running!');
+    
     const mainContent = document.querySelector('.main-content');
     const markerToolButton = document.getElementById('marker-tool-button');
     const fileInput = document.getElementById('file-input');
@@ -8,12 +32,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportarImagemModal = document.getElementById('exportar-imagem');
     const undoButton = document.getElementById('undo-button');
     const redoButton = document.getElementById('redo-button');
+    
+    console.log('Elements found:', {
+        mainContent: !!mainContent,
+        undoButton: !!undoButton,
+        redoButton: !!redoButton
+    });
 
     let canvas, ctx;
     let isDrawing = false;
     let isMarkerActive = false;
+    let isCuttingActive = false;
     let lastX, lastY;
     let currentImage = null;
+    let selectionStartX, selectionStartY;
+    let selectionEndX, selectionEndY;
+    let isSelecting = false;
+    let overlayCanvas, overlayCtx;
 
     // Action Stack System
     const MAX_STACK_SIZE = 50;
@@ -22,30 +57,136 @@ document.addEventListener('DOMContentLoaded', () => {
     let isActionInProgress = false;
 
     class CanvasAction {
-        constructor(type, data) {
+        constructor(type, data, originalImage = null, canvasWidth = null, canvasHeight = null) {
             this.type = type;
             this.data = data;
+            this.originalImage = originalImage; // Store original image for crop operations
+            this.canvasWidth = canvasWidth; // Store canvas width
+            this.canvasHeight = canvasHeight; // Store canvas height
             this.timestamp = Date.now();
         }
     }
 
     function saveCanvasState() {
         if (!canvas) return null;
-        return canvas.toDataURL('image/png');
+        return {
+            dataURL: canvas.toDataURL('image/png'),
+            width: canvas.width,
+            height: canvas.height
+        };
     }
 
-    function loadCanvasState(dataURL) {
+    function loadCanvasState(dataURL, originalImage = null, canvasWidth = null, canvasHeight = null) {
         if (!canvas || !ctx) return;
+        
+        console.log('Loading canvas state:', { canvasWidth, canvasHeight, hasOriginalImage: !!originalImage });
+        
         const img = new Image();
         img.onload = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
+            // If this is a crop operation and we have the original image, restore it properly
+            if (originalImage) {
+                console.log('Restoring original image with dimensions:', { canvasWidth, canvasHeight });
+                
+                // Reset all state
+                isSelecting = false;
+                isCuttingActive = false;
+                isMarkerActive = false;
+                selectionStartX = selectionStartY = selectionEndX = selectionEndY = 0;
+                
+                // Update current image to the original image
+                currentImage = originalImage;
+                
+                // Use stored canvas dimensions if available, otherwise calculate from original image
+                let newCanvasWidth, newCanvasHeight;
+                
+                if (canvasWidth && canvasHeight) {
+                    // Use stored dimensions
+                    newCanvasWidth = canvasWidth;
+                    newCanvasHeight = canvasHeight;
+                    console.log('Using stored dimensions:', { newCanvasWidth, newCanvasHeight });
+                } else {
+                    // Calculate dimensions from original image
+                    const mainContentWidth = mainContent.clientWidth;
+                    const mainContentHeight = mainContent.clientHeight;
+                    const imgAspectRatio = originalImage.width / originalImage.height;
+                    
+                    newCanvasWidth = mainContentWidth;
+                    newCanvasHeight = newCanvasWidth / imgAspectRatio;
+                    
+                    if (newCanvasHeight > mainContentHeight) {
+                        newCanvasHeight = mainContentHeight;
+                        newCanvasWidth = newCanvasHeight * imgAspectRatio;
+                    }
+                    console.log('Calculated dimensions:', { newCanvasWidth, newCanvasHeight });
+                }
+                
+                // Force canvas dimensions update
+                console.log('Before update - Canvas dimensions:', { width: canvas.width, height: canvas.height });
+                canvas.width = newCanvasWidth;
+                canvas.height = newCanvasHeight;
+                console.log('After update - Canvas dimensions:', { width: canvas.width, height: canvas.height });
+                
+                // Update overlay canvas dimensions
+                if (overlayCanvas && overlayCtx) {
+                    overlayCanvas.width = newCanvasWidth;
+                    overlayCanvas.height = newCanvasHeight;
+                    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                }
+                
+                // Reset canvas state and draw original image
+                ctx.setLineDash([]);
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 1;
+                ctx.globalAlpha = 1.0;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+                
+                // Reset tool states
+                if (cuttingToolButton) {
+                    cuttingToolButton.classList.remove('active');
+                }
+                if (markerToolButton) {
+                    markerToolButton.classList.remove('active');
+                }
+                if (canvas) {
+                    canvas.style.cursor = 'default';
+                }
+                
+                // Reattach event listeners to ensure they work properly
+                setupCanvasEventListeners();
+            } else {
+                // For regular operations, restore canvas dimensions and draw the saved state
+                if (canvasWidth && canvasHeight) {
+                    console.log('Restoring regular operation with dimensions:', { canvasWidth, canvasHeight });
+                    canvas.width = canvasWidth;
+                    canvas.height = canvasHeight;
+                    
+                    if (overlayCanvas && overlayCtx) {
+                        overlayCanvas.width = canvasWidth;
+                        overlayCanvas.height = canvasHeight;
+                        overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                    }
+                }
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+            }
         };
         img.src = dataURL;
     }
 
-    function pushAction(type, data) {
+    function pushAction(type, data, originalImage = null, canvasWidth = null, canvasHeight = null) {
         if (isActionInProgress) return;
+
+        console.log('Pushing action:', {
+            type,
+            hasData: !!data,
+            hasOriginalImage: !!originalImage,
+            canvasWidth,
+            canvasHeight,
+            currentActionIndex,
+            actionStackLength: actionStack.length
+        });
 
         // Remove any future actions if we're not at the end of the stack
         if (currentActionIndex < actionStack.length - 1) {
@@ -53,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Add new action
-        const action = new CanvasAction(type, data);
+        const action = new CanvasAction(type, data, originalImage, canvasWidth, canvasHeight);
         actionStack.push(action);
         currentActionIndex = actionStack.length - 1;
 
@@ -64,6 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateUndoRedoButtons();
+        
+        console.log('Action stack after push:', {
+            length: actionStack.length,
+            currentIndex: currentActionIndex,
+            types: actionStack.map(a => a.type)
+        });
     }
 
     function undo() {
@@ -71,7 +218,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isActionInProgress = true;
         currentActionIndex--;
-        loadCanvasState(actionStack[currentActionIndex].data);
+        const action = actionStack[currentActionIndex];
+        
+        console.log('Undo action:', {
+            type: action.type,
+            data: action.data,
+            originalImage: !!action.originalImage,
+            canvasWidth: action.canvasWidth,
+            canvasHeight: action.canvasHeight
+        });
+        
+        // Handle both old and new data formats
+        const dataURL = typeof action.data === 'string' ? action.data : action.data.dataURL;
+        loadCanvasState(dataURL, action.originalImage, action.canvasWidth, action.canvasHeight);
         updateUndoRedoButtons();
         isActionInProgress = false;
     }
@@ -81,7 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isActionInProgress = true;
         currentActionIndex++;
-        loadCanvasState(actionStack[currentActionIndex].data);
+        const action = actionStack[currentActionIndex];
+        
+        // Handle both old and new data formats
+        const dataURL = typeof action.data === 'string' ? action.data : action.data.dataURL;
+        loadCanvasState(dataURL, action.originalImage, action.canvasWidth, action.canvasHeight);
         updateUndoRedoButtons();
         isActionInProgress = false;
     }
@@ -113,23 +276,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize action stack with initial canvas state
     function initializeActionStack() {
+        console.log('Initializing action stack...');
         const initialState = saveCanvasState();
+        console.log('Initial state:', initialState);
         if (initialState) {
-            actionStack = [new CanvasAction('initial', initialState)];
+            actionStack = [new CanvasAction('initial', initialState, null, initialState.width, initialState.height)];
             currentActionIndex = 0;
             updateUndoRedoButtons();
+            console.log('Action stack initialized:', {
+                length: actionStack.length,
+                currentIndex: currentActionIndex,
+                types: actionStack.map(a => a.type)
+            });
+        } else {
+            console.log('No initial state available');
         }
     }
 
     // Event Listeners for Undo/Redo
     if (undoButton) {
         undoButton.addEventListener('click', () => {
+            console.log('Undo button clicked!', {
+                currentActionIndex,
+                actionStackLength: actionStack.length,
+                canUndo: currentActionIndex > 0
+            });
             if (currentActionIndex > 0) undo();
         });
     }
 
     if (redoButton) {
         redoButton.addEventListener('click', () => {
+            console.log('Redo button clicked!', {
+                currentActionIndex,
+                actionStackLength: actionStack.length,
+                canRedo: currentActionIndex < actionStack.length - 1
+            });
             if (currentActionIndex < actionStack.length - 1) redo();
         });
     }
@@ -163,14 +345,26 @@ document.addEventListener('DOMContentLoaded', () => {
             canvas.width = mainContent.clientWidth > 0 ? mainContent.clientWidth : 600;
             canvas.height = mainContent.clientHeight > 0 ? mainContent.clientHeight : 400;
             if (currentState) {
-                loadCanvasState(currentState);
+                loadCanvasState(currentState.dataURL, null, currentState.width, currentState.height);
             }
         } else {
+            // Create main canvas
             canvas = document.createElement('canvas');
             canvas.id = 'imageCanvas';
             mainContent.innerHTML = '';
             mainContent.appendChild(canvas);
             ctx = canvas.getContext('2d');
+
+            // Create overlay canvas for selection
+            overlayCanvas = document.createElement('canvas');
+            overlayCanvas.id = 'overlayCanvas';
+            overlayCanvas.style.position = 'absolute';
+            overlayCanvas.style.top = '0';
+            overlayCanvas.style.left = '0';
+            overlayCanvas.style.pointerEvents = 'none';
+            mainContent.appendChild(overlayCanvas);
+            overlayCtx = overlayCanvas.getContext('2d');
+
             setupCanvasEventListeners();
         }
     }
@@ -208,9 +402,24 @@ document.addEventListener('DOMContentLoaded', () => {
             newCanvasWidth = newCanvasHeight * imgAspectRatio;
         }
         
+        // Update main canvas
         canvas.width = newCanvasWidth;
         canvas.height = newCanvasHeight;
-
+        
+        // Update overlay canvas if it exists
+        if (overlayCanvas && overlayCtx) {
+            overlayCanvas.width = newCanvasWidth;
+            overlayCanvas.height = newCanvasHeight;
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        }
+        
+        // Reset canvas state
+        ctx.setLineDash([]);
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 1.0;
+        
+        // Clear and draw
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
@@ -295,16 +504,184 @@ document.addEventListener('DOMContentLoaded', () => {
         // Save state after drawing is complete
         const currentState = saveCanvasState();
         if (currentState) {
-            pushAction('draw', currentState);
+            pushAction('draw', currentState, null, currentState.width, currentState.height);
         }
+    }
+
+    // Add cutting tool button event listener
+    const cuttingToolButton = document.getElementById('cut-tool-button');
+    if (cuttingToolButton) {
+        cuttingToolButton.addEventListener('click', () => {
+            isCuttingActive = !isCuttingActive;
+            isMarkerActive = false; // Deactivate marker tool if active
+            if (isCuttingActive) {
+                cuttingToolButton.classList.add('active');
+                if (canvas) canvas.style.cursor = 'crosshair';
+            } else {
+                cuttingToolButton.classList.remove('active');
+                if (canvas) canvas.style.cursor = 'default';
+                // Clear any existing selection
+                if (currentImage) {
+                    drawImageWithAspectRatio(currentImage);
+                }
+            }
+        });
+    }
+
+    function drawSelectionRect() {
+        if (!overlayCanvas || !overlayCtx || !isSelecting) return;
+        
+        // Clear the overlay canvas
+        overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        
+        // Draw selection rectangle on overlay
+        overlayCtx.strokeStyle = '#00ff00';
+        overlayCtx.lineWidth = 2;
+        overlayCtx.setLineDash([5, 5]);
+        
+        const width = selectionEndX - selectionStartX;
+        const height = selectionEndY - selectionStartY;
+        
+        overlayCtx.strokeRect(selectionStartX, selectionStartY, width, height);
+    }
+
+    function cropImage() {
+        if (!canvas || !ctx || !currentImage || !isSelecting) return;
+        
+        // Save the original image state before cropping
+        const originalImage = currentImage;
+        
+        // Immediately disable selection to prevent any drawing
+        isSelecting = false;
+        isCuttingActive = false;
+        if (cuttingToolButton) {
+            cuttingToolButton.classList.remove('active');
+        }
+        if (canvas) canvas.style.cursor = 'default';
+        
+        // Calculate crop dimensions
+        const cropX = Math.min(selectionStartX, selectionEndX);
+        const cropY = Math.min(selectionStartY, selectionEndY);
+        const cropWidth = Math.abs(selectionEndX - selectionStartX);
+        const cropHeight = Math.abs(selectionEndY - selectionStartY);
+        
+        // Create a temporary canvas for the cropped image
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = cropWidth;
+        tempCanvas.height = cropHeight;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Draw only the selected portion to the temp canvas
+        tempCtx.drawImage(
+            canvas,
+            cropX, cropY, cropWidth, cropHeight,  // Source rectangle
+            0, 0, cropWidth, cropHeight           // Destination rectangle
+        );
+        
+        // Create a new image from the cropped canvas
+        const croppedImage = new Image();
+        croppedImage.onload = () => {
+            // Update the current image
+            currentImage = croppedImage;
+            
+            // Redraw with the new cropped image
+            drawImageWithAspectRatio(croppedImage);
+            
+            // Save the state to the action stack with original image for undo
+            const currentState = saveCanvasState();
+            console.log('Saving crop state:', {
+                width: currentState.width,
+                height: currentState.height,
+                originalImageWidth: originalImage.width,
+                originalImageHeight: originalImage.height
+            });
+            if (currentState) {
+                pushAction('crop', currentState, originalImage, currentState.width, currentState.height);
+            }
+            
+            // Clear all selection state
+            selectionStartX = selectionStartY = selectionEndX = selectionEndY = 0;
+            
+            // Clear overlay
+            if (overlayCtx) {
+                overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+            }
+        };
+        croppedImage.src = tempCanvas.toDataURL('image/png');
+    }
+
+    function startSelection(e) {
+        if (!isCuttingActive || !canvas || !currentImage) return;
+        
+        isSelecting = true;
+        const pos = getMousePos(canvas, e);
+        selectionStartX = pos.x;
+        selectionStartY = pos.y;
+        selectionEndX = pos.x;
+        selectionEndY = pos.y;
+    }
+
+    function updateSelection(e) {
+        if (!isSelecting || !canvas) return;
+        
+        const pos = getMousePos(canvas, e);
+        selectionEndX = pos.x;
+        selectionEndY = pos.y;
+        drawSelectionRect();
+    }
+
+    function endSelection() {
+        if (!isSelecting) return;
+        
+        // Only crop if there's a meaningful selection (more than 5x5 pixels)
+        if (Math.abs(selectionEndX - selectionStartX) > 5 && 
+            Math.abs(selectionEndY - selectionStartY) > 5) {
+            cropImage();
+        } else {
+            // If selection is too small, just redraw the image
+            if (currentImage) {
+                drawImageWithAspectRatio(currentImage);
+            }
+        }
+        
+        isSelecting = false;
     }
 
     function setupCanvasEventListeners() {
         if (!canvas) return;
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseleave', stopDrawing); 
+        
+        // Existing event listeners
+        canvas.addEventListener('mousedown', (e) => {
+            if (isCuttingActive) {
+                startSelection(e);
+            } else if (isMarkerActive) {
+                startDrawing(e);
+            }
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (isSelecting) {
+                updateSelection(e);
+            } else if (isDrawing) {
+                draw(e);
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            if (isSelecting) {
+                endSelection();
+            } else if (isDrawing) {
+                stopDrawing();
+            }
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+            if (isSelecting) {
+                endSelection();
+            } else if (isDrawing) {
+                stopDrawing();
+            }
+        });
     }
     
     window.addEventListener('resize', () => {
@@ -408,4 +785,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize action stack when the page loads
     setTimeout(initializeActionStack, 100);
+    
+    console.log('Script loaded completely!');
 });
