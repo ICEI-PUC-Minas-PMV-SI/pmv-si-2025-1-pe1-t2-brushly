@@ -151,12 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    let markerColor = 'rgba(255, 255, 0, 0.4)';
+    let markerColor = '#ffff00';
     let markerLineWidth = 20;
     let markerColorIndicator = document.getElementById('marker-color-indicator');
     let markerColorInput = document.getElementById('marker-color-input');
-    let markerOpacityInput = document.getElementById('marker-opacity');
-    let opacityValue = document.getElementById('opacity-value');
 
     function initializeCanvas() {
         if (canvas) {
@@ -216,68 +214,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
-    
-    const base64FromStorage = sessionStorage.getItem('imagemBase64');
-    if (base64FromStorage) {
-        loadImageOntoCanvas(base64FromStorage);
-    } else {
-        initializeCanvas(); 
-        canvas.width = mainContent.clientWidth > 0 ? mainContent.clientWidth : 600;
-        canvas.height = mainContent.clientHeight > 0 ? mainContent.clientHeight : 400;
-        ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = "#AAAAAA";
-        ctx.font = "16px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("Nenhuma imagem carregada. Clique em 'Abrir Imagem'.", canvas.width / 2, canvas.height / 2);
-    }
 
-    if (customButtonEdicao) {
-        customButtonEdicao.addEventListener('click', () => {
-            fileInput.click();
-        });
-    }
-
-    if (fileInput) {
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                fileNameEdicao.value = file.name;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    loadImageOntoCanvas(e.target.result);
-                    if (abrirImagemModal) abrirImagemModal.style.display = 'none'; 
-                };
-                reader.readAsDataURL(file);
-            } else {
-                fileNameEdicao.value = "Nenhum arquivo selecionado";
-            }
-        });
-    }
-    
     function updateMarkerColor() {
         const color = markerColorInput.value;
-        const opacity = markerOpacityInput.value / 100;
-        markerColor = hexToRgba(color, opacity);
+        markerColor = color;
         if (markerColorIndicator) {
             markerColorIndicator.style.backgroundColor = color;
-            markerColorIndicator.style.opacity = opacity;
+            markerColorIndicator.style.opacity = '1';
         }
     }
 
-    function hexToRgba(hex, opacity) {
-        const r = parseInt(hex.slice(1, 3), 16);
-        const g = parseInt(hex.slice(3, 5), 16);
-        const b = parseInt(hex.slice(5, 7), 16);
-        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    }
-
-    if (markerColorInput && markerOpacityInput) {
+    if (markerColorInput) {
         markerColorInput.addEventListener('input', updateMarkerColor);
-        markerOpacityInput.addEventListener('input', () => {
-            opacityValue.textContent = `${markerOpacityInput.value}%`;
-            updateMarkerColor();
-        });
     }
 
     if (markerToolButton) {
@@ -315,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startDrawing(e) {
-        if (!isMarkerActive || !canvas || !currentImage) return; 
+        if (!isMarkerActive || !canvas || !currentImage) return;
         isDrawing = true;
         const pos = getMousePos(canvas, e);
         [lastX, lastY] = [pos.x, pos.y];
@@ -324,6 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineWidth = markerLineWidth;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
+        ctx.globalAlpha = 0.4; // Fixed opacity for marker
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
     }
@@ -341,6 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function stopDrawing() {
         if (!isDrawing || !canvas) return;
         isDrawing = false;
+        ctx.globalAlpha = 1.0; // Reset opacity after drawing
         
         // Save state after drawing is complete
         const currentState = saveCanvasState();
@@ -416,6 +366,45 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Initialize canvas and load image if available
+    const base64FromStorage = sessionStorage.getItem('imagemBase64');
+    if (base64FromStorage) {
+        loadImageOntoCanvas(base64FromStorage);
+    } else {
+        initializeCanvas(); 
+        canvas.width = mainContent.clientWidth > 0 ? mainContent.clientWidth : 600;
+        canvas.height = mainContent.clientHeight > 0 ? mainContent.clientHeight : 400;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#AAAAAA";
+        ctx.font = "16px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Nenhuma imagem carregada. Clique em 'Abrir Imagem'.", canvas.width / 2, canvas.height / 2);
+    }
+
+    if (customButtonEdicao) {
+        customButtonEdicao.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
+
+    if (fileInput) {
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                fileNameEdicao.value = file.name;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    loadImageOntoCanvas(e.target.result);
+                    if (abrirImagemModal) abrirImagemModal.style.display = 'none'; 
+                };
+                reader.readAsDataURL(file);
+            } else {
+                fileNameEdicao.value = "Nenhum arquivo selecionado";
+            }
+        });
+    }
 
     // Initialize action stack when the page loads
     setTimeout(initializeActionStack, 100);
