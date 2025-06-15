@@ -12,8 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let canvas, ctx;
     let isDrawing = false;
     let isMarkerActive = false;
+    let isCuttingActive = false;
     let lastX, lastY;
     let currentImage = null;
+    let selectionStartX, selectionStartY;
+    let selectionEndX, selectionEndY;
+    let isSelecting = false;
+    let overlayCanvas, overlayCtx;
 
     // Action Stack System
     const MAX_STACK_SIZE = 50;
@@ -166,11 +171,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadCanvasState(currentState);
             }
         } else {
+            // Create main canvas
             canvas = document.createElement('canvas');
             canvas.id = 'imageCanvas';
             mainContent.innerHTML = '';
             mainContent.appendChild(canvas);
             ctx = canvas.getContext('2d');
+
+            // Create overlay canvas for selection
+            overlayCanvas = document.createElement('canvas');
+            overlayCanvas.id = 'overlayCanvas';
+            overlayCanvas.style.position = 'absolute';
+            overlayCanvas.style.top = '0';
+            overlayCanvas.style.left = '0';
+            overlayCanvas.style.pointerEvents = 'none';
+            mainContent.appendChild(overlayCanvas);
+            overlayCtx = overlayCanvas.getContext('2d');
+
             setupCanvasEventListeners();
         }
     }
@@ -208,11 +225,24 @@ document.addEventListener('DOMContentLoaded', () => {
             newCanvasWidth = newCanvasHeight * imgAspectRatio;
         }
         
+        // Update both canvases
         canvas.width = newCanvasWidth;
         canvas.height = newCanvasHeight;
-
+        overlayCanvas.width = newCanvasWidth;
+        overlayCanvas.height = newCanvasHeight;
+        
+        // Reset canvas state
+        ctx.setLineDash([]);
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 1.0;
+        
+        // Clear and draw
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Clear overlay
+        overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
     }
 
     function updateMarkerColor() {
@@ -299,12 +329,213 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Add cutting tool button event listener
+    const cuttingToolButton = document.getElementById('cut-tool-button');
+    if (cuttingToolButton) {
+        cuttingToolButton.addEventListener('click', () => {
+            isCuttingActive = !isCuttingActive;
+            isMarkerActive = false; // Deactivate marker tool if active
+            if (isCuttingActive) {
+                cuttingToolButton.classList.add('active');
+                if (canvas) canvas.style.cursor = 'crosshair';
+            } else {
+                cuttingToolButton.classList.remove('active');
+                if (canvas) canvas.style.cursor = 'default';
+                // Clear any existing selection
+                if (currentImage) {
+                    drawImageWithAspectRatio(currentImage);
+                }
+            }
+        });
+    }
+
+    function drawSelectionRect() {
+        if (!overlayCanvas || !overlayCtx || !isSelecting) return;
+        
+        // Clear the overlay canvas
+        overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        
+        // Draw selection rectangle on overlay
+        overlayCtx.strokeStyle = '#00ff00';
+        overlayCtx.lineWidth = 2;
+        overlayCtx.setLineDash([5, 5]);
+        
+        const width = selectionEndX - selectionStartX;
+        const height = selectionEndY - selectionStartY;
+        
+        overlayCtx.strokeRect(selectionStartX, selectionStartY, width, height);
+    }
+
+    function cropImage() {
+        if (!canvas || !ctx || !currentImage || !isSelecting) return;
+        
+        // Clear the overlay immediately
+        if (overlayCtx) {
+            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        }
+        
+        // Immediately disable selection to prevent any drawing
+        isSelecting = false;
+        isCuttingActive = false;
+        if (cuttingToolButton) {
+            cuttingToolButton.classList.remove('active');
+        }
+        if (canvas) canvas.style.cursor = 'default';
+        
+        // Calculate crop dimensions
+        const cropX = Math.min(selectionStartX, selectionEndX);
+        const cropY = Math.min(selectionStartY, selectionEndY);
+        const cropWidth = Math.abs(selectionEndX - selectionStartX);
+        const cropHeight = Math.abs(selectionEndY - selectionStartY);
+        
+        // Create a completely new canvas for the cropped image
+        const newCanvas = document.createElement('canvas');
+        newCanvas.width = cropWidth;
+        newCanvas.height = cropHeight;
+        const newCtx = newCanvas.getContext('2d');
+        
+        // Draw only the selected portion to the new canvas
+        newCtx.drawImage(
+            canvas,
+            cropX, cropY, cropWidth, cropHeight,  // Source rectangle
+            0, 0, cropWidth, cropHeight           // Destination rectangle
+        );
+        
+        // Create a new image from the cropped canvas
+        const croppedImage = new Image();
+        croppedImage.onload = () => {
+            // Create a fresh canvas with the new dimensions
+            const mainContentWidth = mainContent.clientWidth;
+            const mainContentHeight = mainContent.clientHeight;
+            const imgAspectRatio = croppedImage.width / croppedImage.height;
+            
+            let newCanvasWidth = mainContentWidth;
+            let newCanvasHeight = newCanvasWidth / imgAspectRatio;
+            
+            if (newCanvasHeight > mainContentHeight) {
+                newCanvasHeight = mainContentHeight;
+                newCanvasWidth = newCanvasHeight * imgAspectRatio;
+            }
+            
+            // Replace the old canvas with a fresh one
+            const oldCanvas = canvas;
+            const oldOverlay = overlayCanvas;
+            
+            // Create new main canvas
+            canvas = document.createElement('canvas');
+            canvas.id = 'imageCanvas';
+            canvas.width = newCanvasWidth;
+            canvas.height = newCanvasHeight;
+            ctx = canvas.getContext('2d');
+            
+            // Create new overlay canvas
+            overlayCanvas = document.createElement('canvas');
+            overlayCanvas.id = 'overlayCanvas';
+            overlayCanvas.style.position = 'absolute';
+            overlayCanvas.style.top = '0';
+            overlayCanvas.style.left = '0';
+            overlayCanvas.style.pointerEvents = 'none';
+            overlayCanvas.width = newCanvasWidth;
+            overlayCanvas.height = newCanvasHeight;
+            overlayCtx = overlayCanvas.getContext('2d');
+            
+            // Draw the cropped image to the fresh canvas
+            ctx.drawImage(croppedImage, 0, 0, newCanvasWidth, newCanvasHeight);
+            
+            // Replace the canvases in the DOM
+            oldCanvas.parentNode.replaceChild(canvas, oldCanvas);
+            oldOverlay.parentNode.replaceChild(overlayCanvas, oldOverlay);
+            
+            // Update the current image
+            currentImage = croppedImage;
+            
+            // Save the state to the action stack
+            const currentState = saveCanvasState();
+            if (currentState) {
+                pushAction('crop', currentState);
+            }
+            
+            // Clear all selection state
+            selectionStartX = selectionStartY = selectionEndX = selectionEndY = 0;
+            
+            // Reattach event listeners to the new canvas
+            setupCanvasEventListeners();
+        };
+        croppedImage.src = newCanvas.toDataURL('image/png');
+    }
+
+    function startSelection(e) {
+        if (!isCuttingActive || !canvas || !currentImage) return;
+        
+        isSelecting = true;
+        const pos = getMousePos(canvas, e);
+        selectionStartX = pos.x;
+        selectionStartY = pos.y;
+        selectionEndX = pos.x;
+        selectionEndY = pos.y;
+    }
+
+    function updateSelection(e) {
+        if (!isSelecting || !canvas) return;
+        
+        const pos = getMousePos(canvas, e);
+        selectionEndX = pos.x;
+        selectionEndY = pos.y;
+        drawSelectionRect();
+    }
+
+    function endSelection() {
+        if (!isSelecting) return;
+        
+        // Only crop if there's a meaningful selection (more than 5x5 pixels)
+        if (Math.abs(selectionEndX - selectionStartX) > 5 && 
+            Math.abs(selectionEndY - selectionStartY) > 5) {
+            cropImage();
+        } else {
+            // If selection is too small, just redraw the image
+            if (currentImage) {
+                drawImageWithAspectRatio(currentImage);
+            }
+        }
+        
+        isSelecting = false;
+    }
+
     function setupCanvasEventListeners() {
         if (!canvas) return;
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseleave', stopDrawing); 
+        
+        // Existing event listeners
+        canvas.addEventListener('mousedown', (e) => {
+            if (isCuttingActive) {
+                startSelection(e);
+            } else if (isMarkerActive) {
+                startDrawing(e);
+            }
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (isSelecting) {
+                updateSelection(e);
+            } else if (isDrawing) {
+                draw(e);
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            if (isSelecting) {
+                endSelection();
+            } else if (isDrawing) {
+                stopDrawing();
+            }
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+            if (isSelecting) {
+                endSelection();
+            } else if (isDrawing) {
+                stopDrawing();
+            }
+        });
     }
     
     window.addEventListener('resize', () => {
