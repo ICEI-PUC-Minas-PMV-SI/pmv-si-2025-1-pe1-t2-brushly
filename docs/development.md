@@ -15,11 +15,12 @@
 
 ## Descrição das estruturas:
 
-## Notícia
-|  **Nome**      | **Tipo**          | **Descrição**                             | **Exemplo**                                    |
-|:--------------:|-------------------|-------------------------------------------|------------------------------------------------|
-| Id             | Numero (Inteiro)  | Identificador único da notícia            | 1                                              |
-| Título         | Texto             | Título da notícia                         | Sistemas de Informação PUC Minas é o melhor                                   |
-| Conteúdo       | Texto             | Conteúdo da notícia                       | Sistemas de Informação da PUC Minas é eleito o melhor curso do Brasil                            |
-| Id do usuário  | Numero (Inteiro)  | Identificador do usuário autor da notícia | 1                                              |
+
+| Campo                | Descrição                                                                 |
+|----------------------|---------------------------------------------------------------------------|
+| Brilho                   | Altera o brilho da imagem |
+| Cortar | Recorta parte da imagem selecionada  |
+| Filtros          | Adiciona filtros na imagem |
+| Pincel      | Marcação da imagem através do pincel |
+                                        |
 
