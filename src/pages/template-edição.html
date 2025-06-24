@@ -42,7 +42,7 @@
                 <span>Marcação</span>
                 <div id="marker-color-indicator"></div>
             </div>
-            <div class="sidebar-icon">
+            <div class="sidebar-icon" id="filters-tool-button">
                 <span class="icon">&#9778;</span>
                 <span>Filtros</span>
             </div>
@@ -110,6 +110,68 @@
                 <button onclick="resetAdjustments()">Resetar</button>
                 <button onclick="applyAdjustments()">Aplicar</button>
                 <button onclick="document.getElementById('adjustments-modal').style.display='none'">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="filters-modal" class="modal-page">
+        <div class="modal-content filters-modal">
+            <h2>Filtros de Imagem</h2>
+            
+            <ul class="filters-list" style="list-style: none;">
+                <li class="filter-item" onclick="previewFilter('none')" data-filter="none">
+                    <div class="filter-preview" id="preview-none">
+                        <span style = "cursor: pointer;">Original</span>
+                    </div>
+                </li>
+                
+                <li class="filter-item" onclick="previewFilter('warm')" data-filter="warm">
+                    <div class="filter-preview" id="preview-warm">
+                        <span style = "cursor: pointer;">Quente</span>
+                    </div>
+                </li>
+                
+                <li class="filter-item" onclick="previewFilter('cold')" data-filter="cold">
+                    <div class="filter-preview" id="preview-cold">
+                        <span style = "cursor: pointer;">Frio</span>
+                    </div>
+                </li>
+                
+                <li class="filter-item" onclick="previewFilter('retro')" data-filter="retro">
+                    <div class="filter-preview" id="preview-retro">
+                        <span style = "cursor: pointer;">Retrô</span>
+                    </div>
+                </li>
+                
+                <li class="filter-item" onclick="previewFilter('vintage')" data-filter="vintage">
+                    <div class="filter-preview" id="preview-vintage">
+                        <span style = "cursor: pointer;">Vintage</span>
+                    </div>
+                </li>
+                
+                <li class="filter-item" onclick="previewFilter('blackwhite')" data-filter="blackwhite">
+                    <div class="filter-preview" id="preview-blackwhite">
+                        <span style = "cursor: pointer;">P&B</span>
+                    </div>
+                </li>
+                
+                <li class="filter-item" onclick="previewFilter('sepia')" data-filter="sepia">
+                    <div class="filter-preview" id="preview-sepia">
+                        <span style = "cursor: pointer;">Sépia</span>
+                    </div> 
+                </li>
+                
+                <li class="filter-item" onclick="previewFilter('dramatic')" data-filter="dramatic">
+                    <div class="filter-preview" id="preview-dramatic">
+                        <span style = "cursor: pointer;">Dramático</span>
+                    </div>
+                </li>
+            </ul>
+            
+            <div class="button-row">
+                <button onclick="resetFilter()">Resetar</button>
+                <button onclick="applyFilter()">Aplicar</button>
+                <button onclick="document.getElementById('filters-modal').style.display='none'">Cancelar</button>
             </div>
         </div>
     </div>

@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gammaSlider = document.getElementById('gamma-slider');
     const brightnessValue = document.getElementById('brightness-value');
     const gammaValue = document.getElementById('gamma-value');
+    const filtersToolButton = document.getElementById('filters-tool-button');
     
     console.log('Elements found:', {
         mainContent: !!mainContent,
@@ -58,6 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastAppliedGamma = 1.0; // Store last applied gamma
     let originalImage = null; // Store the original unmodified image
     let hasAdjustmentsApplied = false; // Track if any adjustments have been applied
+    let canvasStateBeforeAdjustments = null;
+    let baseStateForAdjustments = null; // Separate state for adjustments
+    
+    // Filter System
+    let currentFilter = 'none'; // Current applied filter
+    let selectedFilter = 'none'; // Currently selected filter in modal
+    let hasFilterApplied = false; // Track if any filter has been applied
 
     // Action Stack System
     const MAX_STACK_SIZE = 50;
@@ -395,6 +403,10 @@ document.addEventListener('DOMContentLoaded', () => {
             lastAppliedGamma = 1.0;
             hasAdjustmentsApplied = false;
             resetAdjustmentValues();
+            // Reset filter data for new image
+            currentFilter = 'none';
+            selectedFilter = 'none';
+            hasFilterApplied = false;
             // Save initial state after loading image
             setTimeout(initializeActionStack, 100);
         };
@@ -484,6 +496,15 @@ document.addEventListener('DOMContentLoaded', () => {
         adjustmentsToolButton.addEventListener('click', () => {
             const adjustmentsModal = document.getElementById('adjustments-modal');
             if (adjustmentsModal) {
+                // Use the separate base state for adjustments
+                if (baseStateForAdjustments) {
+                    canvasStateBeforeAdjustments = baseStateForAdjustments;
+                } else {
+                    // First time opening adjustments, save current state as base
+                    baseStateForAdjustments = canvas.toDataURL('image/png');
+                    canvasStateBeforeAdjustments = baseStateForAdjustments;
+                }
+                
                 // Use applied values if adjustments have been made, otherwise use defaults
                 if (hasAdjustmentsApplied) {
                     brightness = lastAppliedBrightness;
@@ -511,6 +532,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Filters tool event listener
+    if (filtersToolButton) {
+        filtersToolButton.addEventListener('click', () => {
+            const filtersModal = document.getElementById('filters-modal');
+            if (filtersModal) {
+                // Set selected filter to current applied filter
+                selectedFilter = currentFilter;
+                updateFilterSelection();
+                
+                // Show preview with current filter
+                previewFilter(selectedFilter);
+                
+                filtersModal.style.display = 'flex';
+            }
+        });
+    }
+
+    // Filter click event listeners (no longer needed since we use onclick in HTML)
 
     // Brightness slider event listener
     if (brightnessSlider) {
@@ -862,34 +902,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Adjustment functions
     function previewAdjustments() {
-        if (!canvas || !ctx || !originalImage) return;
+        if (!canvas || !ctx || !baseStateForAdjustments) return;
         
-        // Draw the original image first
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+        // Create a temporary canvas to work with the base state
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext('2d');
         
-        // Get the image data after drawing the original image
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        
-        for (let i = 0; i < data.length; i += 4) {
-            // Apply brightness
-            const brightnessFactor = brightness / 100;
-            data[i] = Math.min(255, Math.max(0, data[i] * brightnessFactor));     // Red
-            data[i + 1] = Math.min(255, Math.max(0, data[i + 1] * brightnessFactor)); // Green
-            data[i + 2] = Math.min(255, Math.max(0, data[i + 2] * brightnessFactor)); // Blue
+        // Load the base state into temp canvas
+        const tempImg = new Image();
+        tempImg.onload = () => {
+            tempCtx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
             
-            // Apply gamma correction
-            data[i] = Math.pow(data[i] / 255, 1 / gamma) * 255;     // Red
-            data[i + 1] = Math.pow(data[i + 1] / 255, 1 / gamma) * 255; // Green
-            data[i + 2] = Math.pow(data[i + 2] / 255, 1 / gamma) * 255; // Blue
-        }
-        
-        ctx.putImageData(imageData, 0, 0);
+            // Get the original state (with filters) as reference
+            const originalImageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
+            const originalData = originalImageData.data;
+            
+            // Create new image data for the result
+            const resultImageData = tempCtx.createImageData(canvas.width, canvas.height);
+            const resultData = resultImageData.data;
+            
+            for (let i = 0; i < originalData.length; i += 4) {
+                // Get original pixel values (with filters applied)
+                const originalR = originalData[i];
+                const originalG = originalData[i + 1];
+                const originalB = originalData[i + 2];
+                const originalA = originalData[i + 3];
+                
+                // Apply brightness based on original values
+                let r = originalR;
+                let g = originalG;
+                let b = originalB;
+                
+                if (brightness !== 100) {
+                    const factor = brightness / 100;
+                    r = Math.min(255, Math.max(0, originalR * factor));
+                    g = Math.min(255, Math.max(0, originalG * factor));
+                    b = Math.min(255, Math.max(0, originalB * factor));
+                }
+                
+                // Apply gamma correction based on original values
+                if (gamma !== 1.0) {
+                    r = Math.pow(r / 255, 1 / gamma) * 255;
+                    g = Math.pow(g / 255, 1 / gamma) * 255;
+                    b = Math.pow(b / 255, 1 / gamma) * 255;
+                }
+                
+                resultData[i] = r;     // Red
+                resultData[i + 1] = g; // Green
+                resultData[i + 2] = b; // Blue
+                resultData[i + 3] = originalA; // Alpha (unchanged)
+            }
+            
+            // Apply the result to the main canvas
+            ctx.putImageData(resultImageData, 0, 0);
+        };
+        tempImg.src = baseStateForAdjustments;
     }
 
     function applyAdjustments() {
-        if (!canvas || !ctx || !originalImage) return;
+        if (!canvas || !ctx || !canvasStateBeforeAdjustments) return;
         
         // Save current state before applying adjustments
         const currentState = saveCanvasState();
@@ -897,52 +970,102 @@ document.addEventListener('DOMContentLoaded', () => {
             pushAction('adjustment', currentState, currentImage, canvas.width, canvas.height);
         }
         
-        // Apply the adjustments permanently
-        previewAdjustments();
-        
-        // Store current values as last applied values
-        lastAppliedBrightness = brightness;
-        lastAppliedGamma = gamma;
-        
-        // Mark that adjustments have been applied
-        hasAdjustmentsApplied = true;
-        
-        // Update current image with adjusted version
-        const adjustedDataURL = canvas.toDataURL('image/png');
-        currentImage = new Image();
-        currentImage.onload = () => {
-            // Image is ready for further operations
+        // Apply the adjustments permanently (synchronously)
+        const tempImg = new Image();
+        tempImg.onload = () => {
+            // Create a temporary canvas to work with the base state
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Load the base state into temp canvas
+            tempCtx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+            
+            // Get the original state (with filters) as reference
+            const originalImageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
+            const originalData = originalImageData.data;
+            
+            // Create new image data for the result
+            const resultImageData = tempCtx.createImageData(canvas.width, canvas.height);
+            const resultData = resultImageData.data;
+            
+            for (let i = 0; i < originalData.length; i += 4) {
+                // Get original pixel values (with filters applied)
+                const originalR = originalData[i];
+                const originalG = originalData[i + 1];
+                const originalB = originalData[i + 2];
+                const originalA = originalData[i + 3];
+                
+                // Apply brightness based on original values
+                let r = originalR;
+                let g = originalG;
+                let b = originalB;
+                
+                if (brightness !== 100) {
+                    const factor = brightness / 100;
+                    r = Math.min(255, Math.max(0, originalR * factor));
+                    g = Math.min(255, Math.max(0, originalG * factor));
+                    b = Math.min(255, Math.max(0, originalB * factor));
+                }
+                
+                // Apply gamma correction based on original values
+                if (gamma !== 1.0) {
+                    r = Math.pow(r / 255, 1 / gamma) * 255;
+                    g = Math.pow(g / 255, 1 / gamma) * 255;
+                    b = Math.pow(b / 255, 1 / gamma) * 255;
+                }
+                
+                resultData[i] = r;     // Red
+                resultData[i + 1] = g; // Green
+                resultData[i + 2] = b; // Blue
+                resultData[i + 3] = originalA; // Alpha (unchanged)
+            }
+            
+            // Apply the result to the main canvas
+            ctx.putImageData(resultImageData, 0, 0);
+            
+            // Store current values as last applied values
+            lastAppliedBrightness = brightness;
+            lastAppliedGamma = gamma;
+            
+            // Mark that adjustments have been applied
+            hasAdjustmentsApplied = true;
+            
+            // Don't update currentImage - keep it separate from adjustments
+            // The canvas now shows the adjusted version, but currentImage remains the base state
+            
+            if (brightnessSlider) {
+                brightnessSlider.value = brightness;
+                brightnessValue.textContent = brightness + '%';
+            }
+            
+            if (gammaSlider) {
+                gammaSlider.value = gamma;
+                gammaValue.textContent = gamma.toFixed(1);
+            }
+            
+            originalImageData = null;
+            
+            // Close modal after adjustments are applied
+            const adjustmentsModal = document.getElementById('adjustments-modal');
+            if (adjustmentsModal) {
+                adjustmentsModal.style.display = 'none';
+            }
         };
-        currentImage.src = adjustedDataURL;
-        
-        // Reset adjustment values for next preview (but keep the stored values)
-        brightness = 100;
-        gamma = 1.0;
-        
-        if (brightnessSlider) {
-            brightnessSlider.value = brightness;
-            brightnessValue.textContent = brightness + '%';
-        }
-        
-        if (gammaSlider) {
-            gammaSlider.value = gamma;
-            gammaValue.textContent = gamma.toFixed(1);
-        }
-        
-        originalImageData = null;
-        
-        // Close modal
-        const adjustmentsModal = document.getElementById('adjustments-modal');
-        if (adjustmentsModal) {
-            adjustmentsModal.style.display = 'none';
-        }
+        tempImg.src = baseStateForAdjustments;
     }
 
     function resetAdjustments() {
-        if (!canvas || !ctx || !originalImage) return;
+        if (!canvas || !ctx || !baseStateForAdjustments) return;
         
-        // Redraw the original image
-        drawImageWithAspectRatio(originalImage);
+        // Restore the canvas to the base state (with filters, without adjustments)
+        const tempImg = new Image();
+        tempImg.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height);
+        };
+        tempImg.src = baseStateForAdjustments;
         
         // Reset adjustment state
         hasAdjustmentsApplied = false;
@@ -971,7 +1094,167 @@ document.addEventListener('DOMContentLoaded', () => {
         originalImageData = null;
     }
 
+    // Filter functions
+    function previewFilter(filterType) {
+        if (!canvas || !ctx || !originalImage) return;
+        
+        selectedFilter = filterType;
+        updateFilterSelection();
+        
+        // Draw the original image first
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+        
+        // Apply the selected filter
+        applyFilterToCanvas(filterType);
+    }
+
+    function applyFilterToCanvas(filterType) {
+        if (!canvas || !ctx) return;
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        switch (filterType) {
+            case 'warm':
+                // Warm filter: increase red and yellow tones
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = Math.min(255, data[i] * 1.2);     // Increase red
+                    data[i + 1] = Math.min(255, data[i + 1] * 1.1); // Slightly increase green
+                    data[i + 2] = Math.max(0, data[i + 2] * 0.9);   // Decrease blue
+                }
+                break;
+                
+            case 'cold':
+                // Cold filter: increase blue and cyan tones
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = Math.max(0, data[i] * 0.9);      // Decrease red
+                    data[i + 1] = Math.min(255, data[i + 1] * 1.1); // Slightly increase green
+                    data[i + 2] = Math.min(255, data[i + 2] * 1.2); // Increase blue
+                }
+                break;
+                
+            case 'retro':
+                // Retro filter: vintage look with faded colors
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = Math.min(255, gray * 1.1 + 20);     // Red with vintage tint
+                    data[i + 1] = Math.min(255, gray * 0.9 + 10); // Green
+                    data[i + 2] = Math.max(0, gray * 0.8);        // Blue
+                }
+                break;
+                
+            case 'vintage':
+                // Vintage filter: sepia-like with faded look
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = Math.min(255, gray * 1.2 + 30);     // Red
+                    data[i + 1] = Math.min(255, gray * 1.0 + 20); // Green
+                    data[i + 2] = Math.max(0, gray * 0.7);        // Blue
+                }
+                break;
+                
+            case 'blackwhite':
+                // Black and white filter
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = gray;     // Red
+                    data[i + 1] = gray; // Green
+                    data[i + 2] = gray; // Blue
+                }
+                break;
+                
+            case 'sepia':
+                // Sepia filter
+                for (let i = 0; i < data.length; i += 4) {
+                    const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = Math.min(255, gray * 1.3 + 30);     // Red
+                    data[i + 1] = Math.min(255, gray * 1.1 + 20); // Green
+                    data[i + 2] = Math.max(0, gray * 0.8);        // Blue
+                }
+                break;
+                
+            case 'dramatic':
+                // Dramatic filter: high contrast with dark tones
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = Math.min(255, Math.max(0, (data[i] - 128) * 1.5 + 128));     // Red
+                    data[i + 1] = Math.min(255, Math.max(0, (data[i + 1] - 128) * 1.5 + 128)); // Green
+                    data[i + 2] = Math.min(255, Math.max(0, (data[i + 2] - 128) * 1.5 + 128)); // Blue
+                }
+                break;
+                
+            case 'none':
+            default:
+                // No filter - keep original
+                break;
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+    }
+
+    function updateFilterSelection() {
+        // Remove active class from all filter items
+        document.querySelectorAll('.filter-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Add active class to selected filter item
+        const selectedItem = document.querySelector(`[data-filter="${selectedFilter}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('active');
+        }
+    }
+
+    function applyFilter() {
+        if (!canvas || !ctx || !originalImage) return;
+        
+        // Use the currently selected filter
+        const filterType = selectedFilter;
+        
+        // Save current state before applying filter
+        const currentState = saveCanvasState();
+        if (currentState) {
+            pushAction('filter', currentState, currentImage, canvas.width, canvas.height);
+        }
+        
+        // Apply the filter permanently
+        currentFilter = filterType;
+        hasFilterApplied = true;
+        
+        // Update current image with filtered version
+        const filteredDataURL = canvas.toDataURL('image/png');
+        currentImage = new Image();
+        currentImage.onload = () => {
+            // Image is ready for further operations
+        };
+        currentImage.src = filteredDataURL;
+        
+        // Close modal
+        const filtersModal = document.getElementById('filters-modal');
+        if (filtersModal) {
+            filtersModal.style.display = 'none';
+        }
+    }
+
+    function resetFilter() {
+        if (!canvas || !ctx || !originalImage) return;
+        
+        // Redraw the original image
+        drawImageWithAspectRatio(originalImage);
+        
+        // Reset filter state
+        currentFilter = 'none';
+        selectedFilter = 'none';
+        hasFilterApplied = false;
+        
+        // Update filter selection
+        updateFilterSelection();
+    }
+
     // Make functions globally accessible
     window.applyAdjustments = applyAdjustments;
     window.resetAdjustments = resetAdjustments;
+    window.previewFilter = previewFilter;
+    window.applyFilter = applyFilter;
+    window.resetFilter = resetFilter;
 });
