@@ -1,19 +1,13 @@
-# Referências
+## Referências Bibliográficas
 
-Inclua todas as referências (livros, artigos, sites, etc) utilizadas no desenvolvimento do trabalho.
+### HTML5
+1. SILVA, Maurício Samy. *HTML5: A linguagem de marcação que revolucionou a web*. 2. ed. São Paulo: Novatec, 2014.  
+2. MDN Web Docs. *HTML: HyperText Markup Language*. Mozilla Developer Network. Disponível em: [https://developer.mozilla.org/pt-BR/docs/Web/HTML](https://developer.mozilla.org/pt-BR/docs/Web/HTML). Acesso em: 20 mar. 2025.
 
-> **Links Úteis**:
-> - [Formato ABNT](https://www.normastecnicas.com/referencias/)
+### CSS3
+1. SILVA, Maurício Samy. *CSS3: Desenvolvimento de páginas web com estilo*. São Paulo: Novatec, 2012.  
+2. MDN Web Docs. *CSS: Cascading Style Sheets*. Mozilla Developer Network. Disponível em: [https://developer.mozilla.org/pt-BR/docs/Web/CSS](https://developer.mozilla.org/pt-BR/docs/Web/CSS). Acesso em: 19 mar. 2025.
 
-Exemplos de referências bibliográficas:
-
-**[1]** - _ELMASRI, Ramez; NAVATHE, Sham. **Sistemas de banco de dados**. 7. ed. São Paulo: Pearson, c2019. E-book. ISBN 9788543025001._
-
-**[2]** - _COPPIN, Ben. **Inteligência artificial**. Rio de Janeiro, RJ: LTC, c2010. E-book. ISBN 978-85-216-2936-8._
-
-**[3]** - _CORMEN, Thomas H. et al. **Algoritmos: teoria e prática**. Rio de Janeiro, RJ: Elsevier, Campus, c2012. xvi, 926 p. ISBN 9788535236996._
-
-**[4]** - _SUTHERLAND, Jeffrey Victor. **Scrum: a arte de fazer o dobro do trabalho na metade do tempo**. 2. ed. rev. São Paulo, SP: Leya, 2016. 236, [4] p. ISBN 9788544104514._
-
-**[5]** - _RUSSELL, Stuart J.; NORVIG, Peter. **Inteligência artificial**. Rio de Janeiro: Elsevier, c2013. xxi, 988 p. ISBN 9788535237016._
-
+### JavaScript
+1. HAVERBEKE, Marijn. *Eloquent JavaScript: Um guia para programadores iniciantes*. 3. ed. São Paulo: Novatec, 2020.  
+2. MDN Web Docs. *JavaScript*. Mozilla Developer Network. Disponível em: [https://developer.mozilla.org/pt-BR/docs/Web/JavaScript](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript). Acesso em: 222 mai. 2025.
