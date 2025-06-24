@@ -1,7 +1,7 @@
 
-#Requisitos do Projeto - Brushly
+# Requisitos do Projeto - Brushly
 
-##Requisitos Funcionais (RF)
+## Requisitos Funcionais (RF)
 
 | Código | Descrição                                                                 | Responsável                 | Artefato Criado              |
 |--------|---------------------------------------------------------------------------|-----------------------------|------------------------------|
