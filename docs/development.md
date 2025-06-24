@@ -22,5 +22,5 @@
 | Cortar | Recorta parte da imagem selecionada  |
 | Filtros          | Adiciona filtros na imagem |
 | Pincel      | Marcação da imagem através do pincel |
-                                        |
+                                        
 
