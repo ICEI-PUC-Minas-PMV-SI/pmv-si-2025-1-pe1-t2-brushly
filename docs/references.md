@@ -10,4 +10,4 @@
 
 ### JavaScript
 1. HAVERBEKE, Marijn. *Eloquent JavaScript: Um guia para programadores iniciantes*. 3. ed. São Paulo: Novatec, 2020.  
-2. MDN Web Docs. *JavaScript*. Mozilla Developer Network. Disponível em: [https://developer.mozilla.org/pt-BR/docs/Web/JavaScript](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript). Acesso em: 222 mai. 2025.
+2. MDN Web Docs. *JavaScript*. Mozilla Developer Network. Disponível em: [https://developer.mozilla.org/pt-BR/docs/Web/JavaScript](https://developer.mozilla.org/pt-BR/docs/Web/JavaScript). Acesso em: 22 mai. 2025.
