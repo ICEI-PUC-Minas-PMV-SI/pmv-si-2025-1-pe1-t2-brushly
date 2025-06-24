@@ -98,6 +98,63 @@ body {
     cursor: pointer;
 }
 
+.adjustments-modal {
+    width: 320px !important;
+}
+
+.adjustment-control {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.adjustment-control label {
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.slider-container input[type="range"] {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.slider-container input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+    border: none;
+}
+
+.slider-container span {
+    min-width: 50px;
+    text-align: right;
+    font-weight: 500;
+    color: #666;
+}
+
 .opacity-control {
     display: flex;
     align-items: center;

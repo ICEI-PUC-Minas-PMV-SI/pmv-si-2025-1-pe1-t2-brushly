@@ -1,9 +1,7 @@
 console.log('Script file loaded!');
-alert('Script is loading!');
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Content Loaded - Script is running!');
-    alert('DOM Content Loaded!');
     
     const undoButton = document.getElementById('undo-button');
     console.log('Undo button found:', !!undoButton);
@@ -11,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (undoButton) {
         undoButton.addEventListener('click', () => {
             console.log('UNDO BUTTON CLICKED!');
-            alert('Undo button clicked!');
         });
     }
 });
@@ -32,6 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportarImagemModal = document.getElementById('exportar-imagem');
     const undoButton = document.getElementById('undo-button');
     const redoButton = document.getElementById('redo-button');
+    const adjustmentsToolButton = document.getElementById('adjustments-tool-button');
+    const brightnessSlider = document.getElementById('brightness-slider');
+    const gammaSlider = document.getElementById('gamma-slider');
+    const brightnessValue = document.getElementById('brightness-value');
+    const gammaValue = document.getElementById('gamma-value');
     
     console.log('Elements found:', {
         mainContent: !!mainContent,
@@ -49,6 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectionEndX, selectionEndY;
     let isSelecting = false;
     let overlayCanvas, overlayCtx;
+    let brightness = 100; // 100% = no change
+    let gamma = 1.0; // 1.0 = no change
+    let originalImageData = null; // Store original image data for adjustments
+    let lastAppliedBrightness = 100; // Store last applied brightness
+    let lastAppliedGamma = 1.0; // Store last applied gamma
+    let originalImage = null; // Store the original unmodified image
+    let hasAdjustmentsApplied = false; // Track if any adjustments have been applied
 
     // Action Stack System
     const MAX_STACK_SIZE = 50;
@@ -375,8 +384,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const img = new Image();
         img.onload = () => {
             currentImage = img;
+            // Store the original unmodified image
+            originalImage = new Image();
+            originalImage.src = img.src;
             drawImageWithAspectRatio(img);
             sessionStorage.removeItem('imagemBase64');
+            // Reset adjustment data for new image
+            originalImageData = null;
+            lastAppliedBrightness = 100;
+            lastAppliedGamma = 1.0;
+            hasAdjustmentsApplied = false;
+            resetAdjustmentValues();
             // Save initial state after loading image
             setTimeout(initializeActionStack, 100);
         };
@@ -422,6 +440,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear and draw
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Reset adjustment data when image is redrawn
+        originalImageData = null;
     }
 
     function updateMarkerColor() {
@@ -455,6 +476,57 @@ document.addEventListener('DOMContentLoaded', () => {
             if (colorPicker) {
                 colorPicker.style.display = 'flex';
             }
+        });
+    }
+
+    // Adjustments tool event listener
+    if (adjustmentsToolButton) {
+        adjustmentsToolButton.addEventListener('click', () => {
+            const adjustmentsModal = document.getElementById('adjustments-modal');
+            if (adjustmentsModal) {
+                // Use applied values if adjustments have been made, otherwise use defaults
+                if (hasAdjustmentsApplied) {
+                    brightness = lastAppliedBrightness;
+                    gamma = lastAppliedGamma;
+                } else {
+                    brightness = 100;
+                    gamma = 1.0;
+                }
+                
+                // Update sliders and values
+                if (brightnessSlider) {
+                    brightnessSlider.value = brightness;
+                    brightnessValue.textContent = brightness + '%';
+                }
+                
+                if (gammaSlider) {
+                    gammaSlider.value = gamma;
+                    gammaValue.textContent = gamma.toFixed(1);
+                }
+                
+                // Show preview with current values
+                previewAdjustments();
+                
+                adjustmentsModal.style.display = 'flex';
+            }
+        });
+    }
+
+    // Brightness slider event listener
+    if (brightnessSlider) {
+        brightnessSlider.addEventListener('input', (e) => {
+            brightness = parseInt(e.target.value);
+            brightnessValue.textContent = brightness + '%';
+            previewAdjustments();
+        });
+    }
+
+    // Gamma slider event listener
+    if (gammaSlider) {
+        gammaSlider.addEventListener('input', (e) => {
+            gamma = parseFloat(e.target.value);
+            gammaValue.textContent = gamma.toFixed(1);
+            previewAdjustments();
         });
     }
 
@@ -787,4 +859,119 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(initializeActionStack, 100);
     
     console.log('Script loaded completely!');
+
+    // Adjustment functions
+    function previewAdjustments() {
+        if (!canvas || !ctx || !originalImage) return;
+        
+        // Draw the original image first
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
+        
+        // Get the image data after drawing the original image
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            // Apply brightness
+            const brightnessFactor = brightness / 100;
+            data[i] = Math.min(255, Math.max(0, data[i] * brightnessFactor));     // Red
+            data[i + 1] = Math.min(255, Math.max(0, data[i + 1] * brightnessFactor)); // Green
+            data[i + 2] = Math.min(255, Math.max(0, data[i + 2] * brightnessFactor)); // Blue
+            
+            // Apply gamma correction
+            data[i] = Math.pow(data[i] / 255, 1 / gamma) * 255;     // Red
+            data[i + 1] = Math.pow(data[i + 1] / 255, 1 / gamma) * 255; // Green
+            data[i + 2] = Math.pow(data[i + 2] / 255, 1 / gamma) * 255; // Blue
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+    }
+
+    function applyAdjustments() {
+        if (!canvas || !ctx || !originalImage) return;
+        
+        // Save current state before applying adjustments
+        const currentState = saveCanvasState();
+        if (currentState) {
+            pushAction('adjustment', currentState, currentImage, canvas.width, canvas.height);
+        }
+        
+        // Apply the adjustments permanently
+        previewAdjustments();
+        
+        // Store current values as last applied values
+        lastAppliedBrightness = brightness;
+        lastAppliedGamma = gamma;
+        
+        // Mark that adjustments have been applied
+        hasAdjustmentsApplied = true;
+        
+        // Update current image with adjusted version
+        const adjustedDataURL = canvas.toDataURL('image/png');
+        currentImage = new Image();
+        currentImage.onload = () => {
+            // Image is ready for further operations
+        };
+        currentImage.src = adjustedDataURL;
+        
+        // Reset adjustment values for next preview (but keep the stored values)
+        brightness = 100;
+        gamma = 1.0;
+        
+        if (brightnessSlider) {
+            brightnessSlider.value = brightness;
+            brightnessValue.textContent = brightness + '%';
+        }
+        
+        if (gammaSlider) {
+            gammaSlider.value = gamma;
+            gammaValue.textContent = gamma.toFixed(1);
+        }
+        
+        originalImageData = null;
+        
+        // Close modal
+        const adjustmentsModal = document.getElementById('adjustments-modal');
+        if (adjustmentsModal) {
+            adjustmentsModal.style.display = 'none';
+        }
+    }
+
+    function resetAdjustments() {
+        if (!canvas || !ctx || !originalImage) return;
+        
+        // Redraw the original image
+        drawImageWithAspectRatio(originalImage);
+        
+        // Reset adjustment state
+        hasAdjustmentsApplied = false;
+        lastAppliedBrightness = 100;
+        lastAppliedGamma = 1.0;
+        
+        // Reset adjustment values
+        resetAdjustmentValues();
+    }
+
+    function resetAdjustmentValues() {
+        brightness = 100;
+        gamma = 1.0;
+        
+        if (brightnessSlider) {
+            brightnessSlider.value = brightness;
+            brightnessValue.textContent = brightness + '%';
+        }
+        
+        if (gammaSlider) {
+            gammaSlider.value = gamma;
+            gammaValue.textContent = gamma.toFixed(1);
+        }
+        
+        // Reset original image data so it gets captured fresh next time
+        originalImageData = null;
+    }
+
+    // Make functions globally accessible
+    window.applyAdjustments = applyAdjustments;
+    window.resetAdjustments = resetAdjustments;
 });
