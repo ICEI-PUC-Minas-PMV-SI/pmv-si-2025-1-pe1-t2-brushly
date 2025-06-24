@@ -2,21 +2,21 @@
 
 
 
-## Título do Projeto
+## 1 - Título do Projeto
 
 Brushly
 
-## Identidade Visual (Marca, Design)
+## 2 - Identidade Visual (Marca, Design)
 
 ![brushly](https://github.com/user-attachments/assets/6a467035-2c54-4140-9103-8adf4aa775aa)
 
 
-## Conjunto de Slides (Estrutura)
+## 3 - Conjunto de Slides (Estrutura)
 
 [template-novo.pdf](https://github.com/user-attachments/files/20892840/template-novo.pdf)
 
 
-## Vídeo de demonstração
+## 4 - Vídeo de demonstração
 
 
 
